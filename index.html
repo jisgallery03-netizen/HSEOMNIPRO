@@ -1,0 +1,2959 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="HSE OMNI PRO — Sistem manajemen K3/HSE terpadu yang berjalan 100% lokal di perangkat Anda, tanpa server dan tanpa koneksi internet.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ffd43b'/%3E%3Cstop offset='100%25' stop-color='%23f59f00'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 4 L54.5 11.5 V27.5 C54.5 44.5 45.5 55.5 32 60.5 C18.5 55.5 9.5 44.5 9.5 27.5 V11.5 Z' fill='url(%23g)'/%3E%3Cpath d='M21.5 30.5 L28.5 37.5 L43 21.5' fill='none' stroke='white' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>HSE OMNI PRO</title>
+<style>
+:root {
+  /* "Forest & Amber" — sidebar hijau tua/charcoal + aksen hijau daun & amber, sengaja beda dari nuansa navy/oranye web referensi */
+  --navy-900: #16281d; --navy-800: #1c3524; --navy-700: #234230;
+  --blue-500: #2f9e44; --blue-600: #268a3a;
+  --green-500: #12b886; --green-600: #0ca678;
+  --orange-500: #eab308; --orange-600: #c98500;
+  --red-500: #e03131; --red-600: #c92a2a;
+  --purple-500: #b45309;
+  --gray-50: #f7f8fc; --gray-100: #eef0f7; --gray-200: #e1e5f2;
+  --gray-400: #9aa2c0; --gray-600: #5a6182; --gray-800: #2a2f4d;
+  --text-dark: #1a1f3a; --radius: 12px; --shadow: 0 1px 2px rgba(20,25,70,.04), 0 6px 16px rgba(20,25,70,.05);
+}
+* { box-sizing: border-box; }
+html, body { overflow-x:hidden; max-width:100%; } /* cegah scrollbar horizontal nyasar akibat sidebar off-canvas di mobile */
+body { margin:0; font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:var(--gray-50); color:var(--text-dark); }
+a { text-decoration:none; color:inherit; cursor:pointer; }
+button { font-family:inherit; }
+.hidden { display:none !important; }
+
+.app-shell { display:flex; min-height:100vh; }
+.sidebar { width:264px; flex-shrink:0; background:linear-gradient(180deg,var(--navy-800) 0%,var(--navy-900) 100%); color:#dbe0f5; display:flex; flex-direction:column; padding:20px 14px; position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { display:flex; align-items:center; gap:10px; padding:6px 10px 22px; }
+.brand .logo-badge { width:40px; height:40px; flex-shrink:0; }
+.brand .brand-text { font-weight:800; font-size:17px; letter-spacing:.3px; color:#fff; font-style:italic; line-height:1.15; }
+.brand .brand-text small { display:block; font-size:9.5px; font-weight:700; color:#ffd43b; letter-spacing:1.4px; font-style:normal; }
+.company-tag { flex-shrink:0; margin:-10px 0 18px 12px; font-size:11.5px; font-weight:700; color:#dbe0f5; opacity:.8; line-height:1.4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+.sidebar-company-logo { height:16px; width:16px; object-fit:contain; border-radius:3px; background:#fff; flex-shrink:0; }
+
+.nav-group-label { font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#7c85b3; margin:16px 12px 8px; }
+.nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; font-size:13.5px; font-weight:500; color:#c3c9e8; margin-bottom:2px; cursor:pointer; transition:background .12s ease; }
+.nav-item:hover { background:rgba(255,255,255,.06); color:#fff; }
+.nav-item.active { background:#fff; color:var(--navy-900); font-weight:700; }
+.nav-item .dot { width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.55; flex-shrink:0; }
+.ico { width:1em; height:1em; display:inline-block; vertical-align:-0.18em; flex-shrink:0; }
+.nav-item .nav-icon { width:19px; text-align:center; font-size:13.5px; flex-shrink:0; opacity:.9; display:inline-flex; align-items:center; justify-content:center; }
+.nav-item .nav-icon .ico { width:16px; height:16px; vertical-align:0; }
+.nav-item.active .nav-icon { opacity:1; }
+
+.sidebar-footer { margin-top:auto; padding-top:14px; }
+.data-card { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; margin-bottom:10px; }
+.data-card .dc-title { font-size:11px; font-weight:800; color:#fff; margin-bottom:2px; }
+.data-card .dc-sub { font-size:10px; color:#9aa2c0; margin-bottom:10px; line-height:1.5; }
+.data-card .dc-row { display:flex; gap:6px; }
+.dc-btn { flex:1; border:none; border-radius:8px; padding:8px 6px; font-size:10.5px; font-weight:800; cursor:pointer; letter-spacing:.2px; }
+.dc-btn.export { background:#ffd43b; color:#1a1f3a; }
+.dc-btn.import { background:rgba(255,255,255,.12); color:#fff; }
+.dc-reset-link { display:block; width:100%; text-align:left; background:none; border:none; color:#7c85b3; font-size:10px; text-decoration:underline; cursor:pointer; padding:8px 0 0; }
+.user-card { display:flex; align-items:center; gap:10px; padding:10px 8px; border-top:1px solid rgba(255,255,255,.08); }
+.user-avatar { width:36px; height:36px; border-radius:10px; background:#303c7a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0; }
+.user-meta { font-size:12.5px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.user-meta span { display:block; font-size:10.5px; font-weight:500; color:#9aa2c0; }
+.logout-link { margin-left:auto; color:#9aa2c0; font-size:18px; flex-shrink:0; cursor:pointer; }
+.sidebar-copyright { text-align:left; font-size:10px; color:#6a729c; padding:10px 8px 2px; letter-spacing:.2px; }
+.modal-hint { font-size:12px; color:var(--gray-600); margin:-8px 0 14px; }
+.user-switch-row { display:flex; align-items:center; gap:12px; padding:10px; border-radius:10px; cursor:pointer; border:1px solid var(--gray-100); margin-bottom:8px; }
+.user-switch-row:hover { background:var(--gray-50); }
+.user-switch-row.active { border-color:var(--blue-500); background:#eef7f0; }
+.user-switch-row .usw-name { font-size:13px; font-weight:700; color:var(--text-dark); }
+.user-switch-row .usw-role { font-size:11px; color:var(--gray-600); }
+
+.main { flex:1; min-width:0; display:flex; flex-direction:column; }
+.topbar { display:flex; align-items:center; gap:14px; padding:14px 26px; background:#fff; border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:5; flex-wrap:wrap; }
+.topbar .proyek-select { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:10px; background:var(--gray-100); font-size:13px; font-weight:600; color:var(--gray-800); cursor:pointer; }
+.topbar .proyek-select select.proyek-select-input { border:none; background:transparent; outline:none; font-size:13px; font-weight:600; color:var(--gray-800); cursor:pointer; font-family:inherit; min-width:150px; }
+.topbar .proyek-select select.proyek-select-input:focus { outline:2px solid var(--green-500); outline-offset:2px; border-radius:4px; }
+.topbar .search-box { flex:1; max-width:420px; display:flex; align-items:center; gap:8px; background:var(--gray-100); border-radius:10px; padding:8px 14px; color:var(--gray-600); font-size:13px; }
+.topbar .search-box input { border:none; background:transparent; outline:none; width:100%; font-size:13px; }
+.topbar .spacer { flex:1; }
+.local-pill { background:linear-gradient(135deg,var(--green-500),var(--green-600)); color:#fff; font-weight:700; font-size:11.5px; padding:8px 14px; border-radius:10px; display:flex; align-items:center; gap:6px; }
+.demo-cta-pill { background:linear-gradient(135deg,var(--orange-500),var(--orange-600)); color:#fff; font-weight:800; font-size:11.5px; padding:8px 14px; border-radius:10px; display:flex; align-items:center; gap:6px; white-space:nowrap; animation:demoPulse 2.2s ease-in-out infinite; }
+@keyframes demoPulse { 0%,100% { box-shadow:0 0 0 0 rgba(234,179,8,.4); } 50% { box-shadow:0 0 0 6px rgba(234,179,8,0); } }
+@media (prefers-reduced-motion: reduce) { .demo-cta-pill { animation:none; } }
+.bell { width:38px; height:38px; border-radius:10px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; flex-shrink:0; }
+.bell .dot { position:absolute; top:8px; right:9px; width:7px; height:7px; border-radius:50%; background:var(--red-500); display:none; }
+.notif-panel { position:absolute; top:46px; right:0; width:340px; max-height:420px; overflow-y:auto; background:#fff; border-radius:12px; box-shadow:0 14px 36px rgba(20,25,70,.22); border:1px solid var(--gray-100); z-index:50; display:none; text-align:left; }
+.notif-panel.open { display:block; }
+.notif-header { padding:13px 16px; font-weight:800; font-size:13px; color:var(--text-dark); border-bottom:1px solid var(--gray-100); position:sticky; top:0; background:#fff; }
+.notif-item { display:flex; gap:10px; padding:12px 16px; border-bottom:1px solid var(--gray-100); cursor:pointer; font-size:12px; line-height:1.5; align-items:flex-start; }
+.notif-item:hover { background:var(--gray-50); }
+.notif-item:last-child { border-bottom:none; }
+.notif-item .ni-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.notif-item .ni-text { color:var(--gray-800); font-weight:500; }
+.notif-item.critical .ni-text { color:var(--red-600); font-weight:700; }
+.notif-item.warning .ni-text { color:var(--orange-600); font-weight:700; }
+.notif-empty { padding:28px 16px; text-align:center; color:var(--gray-600); font-size:12.5px; }
+.topbar-user { display:flex; align-items:center; gap:10px; }
+.topbar-user .avatar { width:36px; height:36px; border-radius:10px; background:var(--navy-800); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; }
+.topbar-user .meta { font-size:12.5px; font-weight:700; }
+.topbar-user .meta span { display:block; font-size:10.5px; color:var(--gray-600); font-weight:500; }
+
+.content { padding:24px 26px 60px; }
+
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.stat-card { border-radius:var(--radius); padding:20px; color:#fff; position:relative; overflow:hidden; box-shadow:var(--shadow); }
+.stat-card .stat-label { font-size:11px; font-weight:800; letter-spacing:1.2px; opacity:.85; }
+.stat-card .stat-value { font-size:34px; font-weight:800; margin:10px 0 4px; font-variant-numeric:tabular-nums; letter-spacing:-0.5px; }
+.stat-card .stat-sub { font-size:11.5px; opacity:.8; }
+.stat-card .stat-icon { position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:9px; border:1.5px solid rgba(255,255,255,.35); background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.stat-blue { background:linear-gradient(135deg,#0f766e,#0c4a44); }
+.stat-green { background:linear-gradient(135deg,#12b886,#087f5b); }
+.stat-orange { background:linear-gradient(135deg,#eab308,#c98500); }
+.stat-red { background:linear-gradient(135deg,#f03e3e,#9a0f0f); }
+
+.panel { background:#fff; border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); border:1px solid var(--gray-100); margin-bottom:20px; min-width:0; }
+.panel-title { font-weight:800; font-style:italic; font-size:15px; letter-spacing:.3px; margin:0 0 2px; }
+.panel-subtitle { font-size:11.5px; color:var(--gray-600); margin:0 0 14px; }
+.grid-2 { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:0; align-items:start; }
+
+.safety-score-card { background:linear-gradient(135deg,var(--navy-700),var(--navy-900)); color:#fff; border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); margin-bottom:16px; }
+.safety-score-card .label { font-size:11px; font-weight:800; letter-spacing:1px; opacity:.85; }
+.safety-score-card .value { font-size:40px; font-weight:800; margin:8px 0; font-variant-numeric:tabular-nums; letter-spacing:-0.5px; }
+.safety-score-card .value small { font-size:16px; opacity:.7; font-weight:600; }
+.bar-track { height:8px; background:rgba(255,255,255,.15); border-radius:6px; overflow:hidden; }
+.bar-fill { height:100%; background:linear-gradient(90deg,#40c057,#82c91e); }
+
+.info-panel { background:#fff8e1; border:1px solid #ffe9a8; border-radius:var(--radius); padding:18px; }
+.info-panel .info-title { color:var(--purple-500); font-weight:800; font-size:13px; display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+.info-panel p { font-size:12.5px; color:var(--gray-800); line-height:1.5; margin:0; }
+.info-btn { width:100%; margin-top:10px; background:var(--navy-900); color:#fff; border:none; padding:11px; border-radius:10px; font-weight:700; font-size:12.5px; cursor:pointer; }
+
+.table-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+table.data-table { width:100%; border-collapse:collapse; font-size:13px; }
+table.data-table th { text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--gray-600); font-weight:800; padding:10px 12px; border-bottom:2px solid var(--gray-100); }
+table.data-table td { padding:12px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
+table.data-table tr:hover td { background:var(--gray-50); }
+.cell-title { font-weight:700; }
+.cell-sub { font-size:11px; color:var(--gray-600); font-style:italic; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+.badge { display:inline-block; padding:4px 10px; border-radius:7px; font-size:10.5px; font-weight:800; letter-spacing:.4px; white-space:nowrap; }
+.sev-low { background:#e6fcf5; color:#0ca678; } .sev-medium { background:#fff9db; color:#e8a300; }
+.sev-high { background:#fff0e6; color:#e8590c; } .sev-critical { background:#ffe3e3; color:#c92a2a; }
+.status-open, .status-in-progress { background:#e7edff; color:#3b5bdb; }
+.status-closed { background:#e6fcf5; color:#0ca678; }
+.status-scheduled { background:#fff9db; color:#e8a300; }
+.status-inactive { background:#eef0f7; color:#5a6182; }
+.status-rejected { background:#ffe3e3; color:#c92a2a; }
+
+.btn { display:inline-flex; align-items:center; gap:6px; padding:9px 16px; border-radius:10px; font-weight:700; font-size:12.5px; border:none; cursor:pointer; white-space:nowrap; }
+.btn-primary { background:var(--navy-900); color:#fff; }
+.btn-primary:hover { background:var(--blue-600); }
+.icon-btn { width:32px; height:32px; border-radius:8px; border:none; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; margin-right:4px; }
+.icon-btn.del { background:#ffe3e3; color:#c92a2a; }
+
+.search-input, .select-input, .text-input, textarea.text-input { border:1px solid var(--gray-200); border-radius:9px; padding:9px 12px; font-size:13px; width:100%; background:#fff; font-family:inherit; }
+
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--navy-900),#2f5233); padding:20px; }
+.login-card { background:#fff; border-radius:18px; padding:38px 34px; width:400px; max-width:100%; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+.login-card .brand { justify-content:center; padding-bottom:20px; }
+.login-card .brand .brand-text { color:var(--navy-900); }
+.login-card .brand .brand-text small { color:var(--orange-600); }
+.login-card h1 { font-size:18px; margin:0 0 4px; text-align:center; }
+.login-card p.sub { text-align:center; color:var(--gray-600); font-size:12.5px; margin:0 0 22px; }
+.field { margin-bottom:14px; }
+.field label { display:block; font-size:12px; font-weight:700; margin-bottom:6px; color:var(--gray-800); }
+.login-btn { width:100%; background:linear-gradient(135deg,var(--blue-500),var(--navy-800)); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; margin-top:6px; }
+.login-btn.secondary { background:var(--gray-100); color:var(--gray-800); margin-top:0; }
+.setup-divider { border-top:1px dashed var(--gray-200); margin:6px 0 16px; }
+.setup-btn-row { display:flex; flex-direction:column; gap:8px; }
+.setup-import-divider { display:flex; align-items:center; gap:10px; margin:22px 0 12px; color:var(--gray-500); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+.setup-import-divider::before, .setup-import-divider::after { content:""; flex:1; border-top:1px solid var(--gray-200); }
+.setup-import-btn { background:#fff; color:var(--navy-900); border:1.5px dashed var(--blue-500); }
+.setup-import-btn:hover { background:var(--gray-50); }
+.logo-upload-btn { display:inline-flex; align-items:center; gap:6px; background:var(--gray-100); color:var(--gray-800); border:1px dashed var(--gray-400); border-radius:9px; padding:9px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+.logo-upload-btn:hover { background:var(--gray-200); }
+.logo-preview-row { display:flex; align-items:center; gap:10px; margin-top:10px; }
+.logo-preview-row img { height:44px; max-width:120px; object-fit:contain; border:1px solid var(--gray-200); border-radius:8px; background:#fff; padding:4px; }
+.logo-preview-row .logo-remove-btn { background:none; border:none; color:var(--red-500); font-size:11px; font-weight:700; cursor:pointer; padding:0; }
+.demo-hint { background:var(--gray-50); border:1px dashed var(--gray-200); border-radius:10px; padding:10px 12px; font-size:11.5px; color:var(--gray-600); margin-top:18px; line-height:1.7; }
+.demo-hint button { background:none; border:none; color:var(--blue-600); font-weight:700; cursor:pointer; padding:0; font-size:11.5px; }
+
+.flash { padding:11px 14px; border-radius:10px; font-size:12.5px; font-weight:600; margin-bottom:14px; }
+.flash-success { background:#e6fcf5; color:#0ca678; }
+.flash-error { background:#ffe3e3; color:#c92a2a; }
+.flash-warning { background:#fff9db; color:#e8a300; }
+.local-banner { background:#fff9db; color:#8a6d00; border:1px solid #ffe066; border-radius:10px; padding:10px 14px; font-size:12px; font-weight:600; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+.modal-overlay { position:fixed; inset:0; background:rgba(15,20,60,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:#fff; border-radius:16px; width:560px; max-width:100%; max-height:88vh; overflow-y:auto; padding:26px; }
+.modal-box h2 { margin:0 0 18px; font-size:17px; }
+.modal-close { float:right; cursor:pointer; color:var(--gray-600); font-size:20px; line-height:1; background:none; border:none; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.form-group { margin-bottom:14px; }
+.form-group label { display:block; font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--gray-600); margin-bottom:6px; }
+
+.empty-state { text-align:center; padding:40px 10px; color:var(--gray-600); font-size:13px; }
+
+.bars { display:flex; align-items:flex-end; gap:14px; height:220px; padding:10px 4px 0; }
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:6px; }
+.bar-col .bar-stack { width:100%; max-width:34px; display:flex; flex-direction:column-reverse; gap:3px; border-radius:6px 6px 0 0; overflow:hidden; }
+.bar-col .bar-seg { width:100%; border-radius:4px; min-height:3px; }
+.bar-col .bar-label { font-size:10.5px; color:var(--gray-600); font-weight:700; }
+.legend-row { display:flex; gap:16px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+.legend-row .legend-item, .donut-legend .legend-item { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--gray-600); font-weight:600; }
+.legend-dot { width:9px; height:9px; border-radius:3px; display:inline-block; flex-shrink:0; }
+.hbar-row { display:grid; grid-template-columns:130px 1fr 34px; align-items:center; gap:10px; margin-bottom:10px; }
+.hbar-row .hbar-label { font-size:12px; font-weight:600; color:var(--gray-800); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.hbar-track { background:var(--gray-100); border-radius:6px; height:14px; overflow:hidden; }
+.hbar-fill { height:100%; background:linear-gradient(90deg,#2f9e44,#1c6b2c); border-radius:6px; }
+.hbar-value { font-size:12px; font-weight:800; text-align:right; }
+.donut-wrap { display:flex; align-items:center; gap:24px; justify-content:center; padding:10px 0; flex-wrap:wrap; }
+.donut { width:170px; height:170px; border-radius:50%; flex-shrink:0; position:relative; }
+.donut::after { content:""; position:absolute; inset:28px; border-radius:50%; background:#fff; }
+.donut-legend { display:flex; flex-direction:column; gap:10px; }
+.donut-legend .legend-item strong { margin-left:4px; }
+
+/* ---- futuristic HUD chart theme (Dashboard-only) ---- */
+.chart-glass { background:linear-gradient(160deg,#16281d 0%,#0d1a12 100%); position:relative; overflow:hidden; }
+.chart-glass::before { content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px); background-size:18px 18px; pointer-events:none; }
+.chart-glass > * { position:relative; z-index:1; }
+.chart-glass .panel-title { color:#fff; }
+.chart-glass .panel-subtitle { color:rgba(255,255,255,.5); }
+.chart-glass .legend-row .legend-item, .chart-glass .donut-legend .legend-item { color:rgba(255,255,255,.72); }
+.trend-svg { display:block; width:100%; height:220px; }
+.trend-svg text { font-family:inherit; }
+.gauge-wrap { position:relative; width:160px; height:160px; margin:6px auto 2px; }
+.gauge-svg { width:100%; height:100%; display:block; }
+.gauge-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.gauge-center .gauge-value { font-size:34px; font-weight:800; color:#fff; line-height:1; }
+.gauge-center .gauge-max { font-size:11px; color:rgba(255,255,255,.55); font-weight:600; margin-top:3px; }
+.clickable { cursor:pointer; transition:transform .12s ease, box-shadow .12s ease; }
+.stat-card.clickable:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(20,25,70,.18); }
+.panel.clickable:hover, .safety-score-card.clickable:hover { transform:translateY(-2px); box-shadow:0 10px 26px rgba(20,25,70,.16); }
+.donut.clickable:hover { filter:brightness(1.08); }
+.donut-legend .legend-item.clickable { cursor:pointer; border-radius:8px; padding:4px 6px; margin:-4px -6px; transition:background .12s ease; }
+.donut-legend .legend-item.clickable:hover { background:var(--gray-50); }
+tr.row-clickable { cursor:pointer; transition:background .1s ease; }
+tr.row-clickable:hover { background:var(--gray-50); }
+.donut-dark::after { background:#0d1a12; z-index:0; }
+.donut-center-label { position:absolute; inset:28px; z-index:1; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.donut-center-label .dcl-value { font-size:24px; font-weight:800; color:#fff; }
+.donut-center-label .dcl-label { font-size:9px; letter-spacing:.6px; color:rgba(255,255,255,.5); margin-top:2px; }
+
+.leaderboard { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:22px; }
+.leader-card { border:1px solid var(--gray-200); border-radius:var(--radius); padding:18px; background:#fffdf5; }
+.leader-card .role { font-size:10.5px; font-weight:800; letter-spacing:.6px; color:var(--gray-600); text-transform:uppercase; }
+.leader-card .name { font-weight:800; font-size:15px; margin:6px 0 10px; }
+.leader-card .pts { display:inline-flex; align-items:center; gap:4px; background:#fff3bf; color:#e8a300; font-weight:800; font-size:11px; padding:3px 9px; border-radius:20px; }
+.leader-stats { display:flex; gap:18px; margin-top:14px; }
+.leader-stats div span { display:block; font-size:10px; color:var(--gray-600); font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+.leader-stats div strong { font-size:18px; }
+
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.kpi-tile { background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:16px; }
+.kpi-tile .kpi-label { font-size:10.5px; font-weight:800; color:var(--gray-600); text-transform:uppercase; letter-spacing:.5px; }
+.kpi-tile .kpi-value { font-size:24px; font-weight:800; margin-top:6px; }
+
+.icon-btn.view { background:#e7f5ff; color:#1971c2; }
+.icon-btn.view-alt { background:#e6fcf5; color:#0ca678; }
+.icon-btn.edit { background:#ebfbee; color:#2f9e44; }
+
+.kondisi-baik { background:#e6fcf5; color:#0ca678; }
+.kondisi-rusak { background:#ffe3e3; color:#c92a2a; }
+.kondisi-perlu-perbaikan { background:#fff3bf; color:#e8590c; }
+.risk-low { background:#e6fcf5; color:#0ca678; }
+.risk-medium { background:#fff9db; color:#e8a300; }
+.risk-high { background:#fff0e6; color:#e8590c; }
+.risk-extreme { background:#ffe3e3; color:#c92a2a; }
+.doc-active { background:#e6fcf5; color:#0ca678; }
+.doc-expired { background:#ffe3e3; color:#c92a2a; }
+.doc-warning { background:#fff3bf; color:#e8590c; }
+
+/* ---- CAPA card layout ---- */
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.capa-card { background:#fff; border:1px solid var(--gray-200); border-left:5px solid var(--gray-400); border-radius:12px; padding:16px; box-shadow:var(--shadow); }
+.capa-card.sev-border-low { border-left-color:#0ca678; }
+.capa-card.sev-border-medium { border-left-color:#e8a300; }
+.capa-card.sev-border-high { border-left-color:#e8590c; }
+.capa-card.sev-border-critical { border-left-color:#c92a2a; }
+.capa-card .capa-code { font-size:10.5px; font-weight:800; color:var(--gray-600); letter-spacing:.4px; text-transform:uppercase; }
+.capa-card .capa-title { font-weight:800; font-size:14px; margin:6px 0 8px; }
+.capa-card .capa-desc { font-size:12px; color:var(--gray-600); line-height:1.5; margin-bottom:10px; min-height:34px; }
+.capa-card .capa-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:11px; color:var(--gray-600); margin-bottom:10px; }
+.capa-card .capa-actions { display:flex; gap:6px; align-items:center; border-top:1px solid var(--gray-100); padding-top:10px; }
+.capa-card select.status-quick { flex:1; border:1px solid var(--gray-200); border-radius:8px; padding:6px 8px; font-size:11.5px; font-weight:700; }
+
+/* ---- shared "document view" modal (STANDARD ATTACHMENT pattern) ---- */
+.view-modal-box { width:680px; }
+.print-masthead { display:none; }
+.view-head { display:flex; align-items:center; justify-content:space-between; gap:14px; background:var(--gray-50); border:1px solid var(--gray-100); border-radius:12px; padding:14px 16px; margin-bottom:16px; flex-wrap:wrap; }
+.view-head .vh-title { display:flex; align-items:center; gap:12px; }
+.view-head .vh-icon { width:38px; height:38px; border-radius:9px; background:#fff; border:1px solid var(--gray-200); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.view-head .vh-name { font-weight:800; font-size:14px; }
+.view-head .vh-sub { font-size:10px; font-weight:700; color:var(--gray-600); letter-spacing:.5px; }
+.view-head .vh-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.vh-btn { border:none; border-radius:9px; padding:9px 14px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+.vh-btn.primary { background:var(--blue-500); color:#fff; }
+.vh-btn.dark { background:var(--navy-900); color:#fff; }
+.vh-btn.light { background:#fff; color:var(--navy-900); border:1px solid var(--gray-200); }
+.meta-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:14px 0; border-bottom:1px solid var(--gray-100); margin-bottom:16px; }
+.meta-row .mr-item { font-size:10px; }
+.meta-row .mr-label { color:var(--gray-600); font-weight:800; letter-spacing:.4px; text-transform:uppercase; margin-bottom:4px; }
+.meta-row .mr-value { font-size:12.5px; font-weight:700; color:var(--text-dark); }
+.view-banner { border-radius:12px; padding:16px 18px; margin-bottom:16px; }
+.view-banner .vb-tag { font-size:10.5px; font-weight:800; letter-spacing:.6px; opacity:.85; }
+.view-banner .vb-title { font-size:17px; font-weight:800; font-style:italic; margin-top:4px; }
+.view-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+.view-detail-box { background:var(--gray-50); border:1px solid var(--gray-100); border-radius:10px; padding:12px 14px; }
+.view-detail-box.full { grid-column:1 / -1; }
+.view-detail-box .vd-label { font-size:10px; font-weight:800; letter-spacing:.4px; color:var(--gray-600); text-transform:uppercase; margin-bottom:6px; }
+.view-detail-box .vd-value { font-size:13px; font-weight:600; line-height:1.5; white-space:pre-wrap; }
+.view-evidence { border:2px dashed var(--gray-200); border-radius:12px; padding:26px 20px; text-align:center; color:var(--gray-600); }
+.view-evidence .ve-icon { font-size:28px; margin-bottom:8px; }
+.view-evidence .ve-title { font-weight:800; font-size:12.5px; margin-bottom:4px; }
+.view-evidence .ve-sub { font-size:11px; line-height:1.5; }
+
+/* ---- kartu "Lihat" khusus HIRADC & PTW (meniru struktur web referensi) ---- */
+.vd2-activity-row { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+.vd2-section-title { font-size:11px; font-weight:800; letter-spacing:.5px; color:var(--blue-600); text-transform:uppercase; margin-bottom:6px; }
+.vd2-activity-title { font-size:17px; font-weight:800; line-height:1.3; }
+.vd2-activity-id { font-size:10.5px; font-weight:700; color:var(--gray-600); margin-top:6px; display:flex; align-items:center; gap:8px; }
+.vd2-badge-risk { padding:10px 18px; border-radius:10px; font-weight:800; font-size:12.5px; white-space:nowrap; }
+.vd2-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.vd2-card { background:var(--gray-50); border:1px solid var(--gray-100); border-radius:12px; padding:14px 16px; }
+.vd2-card .vd2-label { font-size:10px; font-weight:800; letter-spacing:.4px; color:var(--gray-600); text-transform:uppercase; margin-bottom:6px; }
+.vd2-card .vd2-text { font-size:13px; font-weight:600; line-height:1.5; white-space:pre-wrap; margin-bottom:12px; }
+.vd2-subgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; margin-bottom:6px; }
+.vd2-score-card { text-align:center; }
+.vd2-score-big { font-size:42px; font-weight:800; color:var(--text-dark); line-height:1.1; }
+.vd2-score-sub { display:flex; justify-content:center; gap:26px; margin-top:12px; font-size:10.5px; color:var(--gray-600); font-weight:700; letter-spacing:.3px; }
+.vd2-score-sub b { display:block; font-size:16px; color:var(--text-dark); margin-top:2px; }
+.vd2-controls-box { background:#eaf7f0; border:1px solid #c9ecd9; border-radius:12px; padding:14px 16px; margin-bottom:14px; }
+.vd2-controls-box .vd2-label { font-size:10px; font-weight:800; letter-spacing:.4px; color:var(--blue-600); text-transform:uppercase; margin-bottom:6px; }
+.vd2-controls-box .vd2-text { font-size:13px; font-weight:600; line-height:1.5; white-space:pre-wrap; }
+.vd2-dark-box { background:var(--navy-900); color:#dbe0f5; border-radius:12px; padding:14px 16px; margin-bottom:14px; }
+.vd2-dark-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.vd2-dark-row:last-child { margin-bottom:0; }
+.vd2-dark-icon { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
+.vd2-dark-label { font-size:9.5px; font-weight:800; letter-spacing:.4px; color:#9aa2c0; text-transform:uppercase; margin-bottom:3px; }
+.vd2-dark-value { font-size:13px; font-weight:700; color:#fff; }
+.vd2-stamp-row { display:flex; align-items:center; justify-content:center; margin:18px 0; }
+.vd2-stamp { width:84px; height:84px; border-radius:50%; border:2px dashed var(--blue-500); display:flex; align-items:center; justify-content:center; text-align:center; font-size:9px; font-weight:800; color:var(--blue-600); line-height:1.3; padding:6px; transform:rotate(-8deg); }
+.vd2-pending-note { background:#fff9db; border:1px solid #ffe58f; color:#8a6d00; border-radius:10px; padding:10px 14px; font-size:12px; font-weight:600; text-align:center; margin:16px 0; }
+.vd2-pending-note.vd2-reject-note { background:#ffe3e3; border-color:#ffc9c9; color:#c92a2a; }
+.vd2-sign-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; text-align:center; margin:16px 0; padding-top:16px; border-top:1px dashed var(--gray-200); }
+.vd2-sign-name { font-weight:800; font-size:12.5px; border-top:1px solid var(--gray-400); margin-top:30px; padding-top:6px; }
+.vd2-sign-role { font-size:10px; color:var(--gray-600); font-style:italic; }
+
+/* ---- "Dokumen Resmi" HIRADC — gaya formulir cetak baku bergaris tabel ---- */
+.doc2-wrap { font-size:12px; }
+.doc2-table { width:100%; border-collapse:collapse; }
+.doc2-table td, .doc2-table th { border:1px solid #999; padding:8px 10px; vertical-align:top; font-size:11.5px; text-align:left; }
+.doc2-table-attached { margin-top:-1px; }
+.doc2-label-cell { font-weight:700; background:var(--gray-50); white-space:nowrap; width:1%; }
+.doc2-formulir-title { text-align:center; font-weight:800; font-size:13px; letter-spacing:.3px; }
+.doc2-center { text-align:center; }
+.doc2-subhead td { text-align:center; font-size:10px; font-weight:700; color:var(--gray-600); padding:4px 8px; }
+.doc2-risk-pill { display:inline-block; padding:3px 12px; border-radius:6px; font-weight:800; }
+.doc2-matrix-wrap { display:flex; flex-wrap:wrap; gap:20px; margin:16px 0; align-items:flex-start; }
+.doc2-matrix-table { border-collapse:collapse; font-size:10.5px; }
+.doc2-matrix-table td, .doc2-matrix-table th { border:1px solid #999; width:28px; height:26px; text-align:center; font-weight:700; }
+.doc2-matrix-table th { background:var(--gray-50); }
+.cell-L { background:#e6fcf5; color:#0ca678; }
+.cell-M { background:#fff9db; color:#e8a300; }
+.cell-H { background:#ffe8cc; color:#e8590c; }
+.cell-E { background:#ffe3e3; color:#c92a2a; }
+.doc2-matrix-table .cell-active { outline:3px solid var(--navy-900); outline-offset:-3px; }
+.doc2-legend { font-size:11px; line-height:2; align-self:center; }
+.doc2-legend b { display:inline-block; width:20px; text-align:center; border-radius:4px; margin-right:6px; padding:1px 0; }
+.doc2-explain-table { width:100%; border-collapse:collapse; font-size:10.5px; margin-top:2px; line-height:1.7; }
+.doc2-explain-table td, .doc2-explain-table th { border:1px solid #999; padding:8px 10px; vertical-align:top; text-align:left; }
+.doc2-sign-table { width:100%; border-collapse:collapse; margin-top:16px; text-align:center; }
+.doc2-sign-table td { border:1px solid #999; padding:16px 10px; font-weight:700; }
+.doc2-sign-placeholder { font-style:italic; font-weight:400; color:#999; margin-bottom:34px; }
+.doc2-sign-role-label { font-weight:700; font-size:11px; border-top:1px solid #999; padding-top:6px; }
+
+.attach-block { border:1px solid var(--gray-100); border-radius:12px; padding:16px; background:var(--gray-50); }
+.attach-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.attach-header span { font-weight:800; font-size:12px; letter-spacing:.4px; color:var(--gray-800); }
+.attach-upload-btn { background:var(--navy-900); color:#fff; font-size:11.5px; font-weight:700; padding:8px 12px; border-radius:8px; cursor:pointer; display:inline-block; }
+.attach-upload-btn:hover { opacity:.9; }
+.attach-row { display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--gray-100); border-radius:10px; padding:9px 12px; margin-bottom:8px; }
+.attach-row .attach-icon { font-size:18px; flex-shrink:0; }
+.attach-row .attach-meta { flex:1; min-width:0; }
+.attach-row .attach-name { font-size:12.5px; font-weight:700; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.attach-row .attach-size { font-size:10.5px; color:var(--gray-600); }
+.attach-row .attach-dl, .attach-row .attach-del { flex-shrink:0; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; text-decoration:none; font-size:13px; border:none; }
+.attach-row .attach-dl { background:#e6fcf5; color:#0ca678; }
+.attach-row .attach-del { background:#fff0f0; color:var(--red-600); }
+.attach-empty { font-size:12px; color:var(--gray-600); padding:6px 2px 10px; }
+.attach-hint { font-size:10.5px; color:var(--gray-600); line-height:1.5; margin-top:2px; }
+
+/* ---- Pusat Dokumen ---- */
+.doc-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+.doc-stat { border:1px solid var(--gray-200); border-radius:12px; padding:16px; text-align:center; }
+.doc-stat .ds-label { font-size:10.5px; font-weight:800; letter-spacing:.6px; color:var(--gray-600); }
+.doc-stat .ds-value { font-size:26px; font-weight:800; margin-top:6px; font-variant-numeric:tabular-nums; }
+.module-stat-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; margin-bottom:18px; }
+.module-stat-card { border:1.5px solid var(--gray-200); border-radius:14px; padding:14px 18px; background:#fff; }
+.module-stat-card .msc-label { font-size:11px; font-weight:800; letter-spacing:.5px; color:var(--gray-600); text-transform:uppercase; margin-bottom:8px; }
+.module-stat-card .msc-value { font-size:24px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text-dark); font-variant-numeric:tabular-nums; }
+.module-stat-card.msc-violet { border-color:#c9bdf7; } .module-stat-card.msc-violet .msc-value { color:#5b3df0; }
+.module-stat-card.msc-green { border-color:#9fe3c3; } .module-stat-card.msc-green .msc-value { color:#1baf7a; }
+.module-stat-card.msc-amber { border-color:#f7d99e; } .module-stat-card.msc-amber .msc-value { color:#e8a300; }
+.module-stat-card.msc-red { border-color:#f5b3b3; } .module-stat-card.msc-red .msc-value { color:#e34948; }
+.doc-list-row { display:flex; align-items:center; gap:14px; padding:14px 4px; border-bottom:1px solid var(--gray-100); flex-wrap:wrap; }
+.doc-icon { width:38px; height:38px; border-radius:9px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.doc-info { flex:1; min-width:160px; }
+.doc-info .di-name { font-weight:700; font-size:13px; }
+.doc-info .di-meta { font-size:11px; color:var(--gray-600); }
+.doc-col { width:110px; font-size:12px; color:var(--gray-800); flex-shrink:0; }
+
+/* ---- Kalender Keselamatan ---- */
+.cal-toolbar { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+.cal-cat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px; }
+.cal-cat { border-radius:10px; padding:12px 14px; color:#fff; font-weight:700; font-size:12px; }
+.cal-cat .cc-count { font-size:20px; font-weight:800; margin-top:2px; }
+.cal-nav { display:flex; align-items:center; gap:14px; }
+.cal-nav button { border:none; background:var(--gray-100); width:30px; height:30px; border-radius:8px; cursor:pointer; font-weight:800; }
+.cal-nav .cal-month-label { font-weight:800; font-style:italic; font-size:15px; min-width:150px; text-align:center; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); border:1px solid var(--gray-100); border-radius:10px; overflow:hidden; }
+.cal-grid .cal-dow { background:var(--gray-50); font-size:10px; font-weight:800; letter-spacing:.5px; text-align:center; padding:8px 0; color:var(--gray-600); }
+.cal-cell { min-height:82px; border-top:1px solid var(--gray-100); border-left:1px solid var(--gray-100); padding:6px; position:relative; }
+.cal-cell .cal-daynum { font-size:11px; font-weight:700; color:var(--gray-600); }
+.cal-cell.today .cal-daynum { background:var(--navy-900); color:#fff; border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; }
+.cal-event { display:block; font-size:10px; font-weight:700; color:#fff; border-radius:5px; padding:2px 6px; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; }
+
+/* ---- tabel lebar (Insiden, HIRADC, PTW, dst.) bisa digeser horizontal alih-alih terpotong ---- */
+.table-scroll { width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.doc2-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+/* ---- hamburger + overlay drawer sidebar (disembunyikan di layar lebar, diaktifkan di media query bawah) ---- */
+.sidebar-toggle-btn { display:none; align-items:center; justify-content:center; width:38px; height:38px; flex-shrink:0; border:none; border-radius:10px; background:var(--gray-100); color:var(--gray-800); font-size:18px; cursor:pointer; }
+.sidebar-backdrop { display:none; position:fixed; inset:0; background:rgba(12,18,45,.5); z-index:25; }
+
+@media (max-width:1100px) {
+  .stat-grid, .kpi-grid { grid-template-columns:repeat(2,1fr); }
+  .grid-2 { grid-template-columns:1fr; }
+  .leaderboard { grid-template-columns:1fr; }
+  .cal-cat-row { grid-template-columns:repeat(2,1fr); }
+  .meta-row, .view-detail-grid, .doc-stat-row { grid-template-columns:1fr; }
+  .vd2-grid, .vd2-subgrid, .vd2-sign-row { grid-template-columns:1fr; }
+
+  /* ---- mobile/tablet: sidebar jadi drawer yang dibuka lewat tombol hamburger ---- */
+  .sidebar-toggle-btn { display:flex; }
+  .app-shell { position:relative; }
+  .sidebar { position:fixed; left:0; top:0; z-index:30; transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 34px rgba(10,15,40,.35); }
+  .app-shell.sidebar-open .sidebar { transform:translateX(0); }
+  .app-shell.sidebar-open .sidebar-backdrop { display:block; }
+  .main { width:100%; min-width:0; }
+  .topbar { padding:12px 16px; gap:10px; }
+  .topbar .search-box { max-width:none; }
+  .form-row { grid-template-columns:1fr; }
+  .modal-box { padding:18px; }
+  .hbar-row { grid-template-columns:96px 1fr 30px; }
+}
+
+@media (max-width:560px) {
+  .stat-grid, .kpi-grid, .cal-cat-row { grid-template-columns:repeat(2,1fr); }
+  .doc2-explain-table, .doc2-matrix-table, .doc2-table-attached { min-width:560px; }
+  .table-toolbar { align-items:stretch; }
+  .table-toolbar > div { width:100%; }
+  .panel { padding:16px; }
+  .topbar { padding:10px 12px; }
+  .modal-box { padding:14px; border-radius:12px; }
+  .stat-card { padding:14px; }
+  .cal-cell { min-height:64px; padding:4px; }
+}
+
+/* ---- cetak dokumen: kop nama & logo perusahaan, sembunyikan sisa antarmuka ---- */
+@media print {
+  body * { visibility:hidden; }
+  #viewModal, #viewModal * { visibility:visible; }
+  #viewModal { position:absolute; inset:0; background:#fff; padding:0; margin:0; display:block; }
+  #viewModal .modal-box { box-shadow:none; max-height:none; overflow:visible; width:100%; max-width:100%; padding:14px; border-radius:0; }
+  #viewModal .modal-close, #viewModal .vh-actions, #viewModal .attach-header .attach-upload-btn, #viewModal .attach-del { display:none !important; }
+  .print-masthead { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding-bottom:14px; margin-bottom:16px; border-bottom:2px solid #000; text-align:center; }
+  .print-masthead img { height:52px; width:auto; max-width:140px; object-fit:contain; margin:0 auto; }
+  .print-masthead .pm-name { font-weight:800; font-size:16px; color:#000; text-align:center; }
+  .print-masthead .pm-sub { font-size:10.5px; color:#444; margin-top:2px; text-align:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ SETUP PERUSAHAAN ============================ -->
+<div id="setupScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo-badge" id="loginLogo"></div>
+      <div class="brand-text">HSE OMNI PRO<small>LOCAL EDITION</small></div>
+    </div>
+    <h1>Setup Perusahaan Anda</h1>
+    <p class="sub">Isi sekali saja &mdash; otomatis tersimpan di perangkat ini, tidak akan ditanyakan lagi</p>
+    <div id="setupFlash"></div>
+    <form id="companySetupForm">
+      <div class="field">
+        <label>Nama Perusahaan *</label>
+        <input class="text-input" type="text" id="setupCompanyName" name="name" placeholder="Contoh: PT Sinergi Konstruksi" required autofocus>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Bidang Usaha</label>
+          <input class="text-input" type="text" id="setupIndustry" name="industry" placeholder="Konstruksi, Manufaktur...">
+        </div>
+        <div class="field">
+          <label>No. Telepon</label>
+          <input class="text-input" type="text" id="setupPhone" name="phone" placeholder="021-5551234">
+        </div>
+      </div>
+      <div class="field">
+        <label>Alamat</label>
+        <input class="text-input" type="text" id="setupAddress" name="address" placeholder="Alamat kantor / lokasi utama">
+      </div>
+      <div class="field">
+        <label>Logo Perusahaan (opsional)</label>
+        <label class="logo-upload-btn">&#128247; Pilih Logo<input type="file" accept="image/*" class="hidden" id="setupLogoInput"></label>
+        <div class="logo-preview-row" id="setupLogoPreview"></div>
+      </div>
+      <div class="setup-divider"></div>
+      <div class="form-row">
+        <div class="field">
+          <label>Nama PIC *</label>
+          <input class="text-input" type="text" id="setupPicName" name="pic_name" placeholder="Nama Anda" required>
+        </div>
+        <div class="field">
+          <label>Jabatan *</label>
+          <input class="text-input" type="text" id="setupPicRole" name="pic_role" placeholder="Contoh: HSE Manager" required>
+        </div>
+      </div>
+      <div class="setup-btn-row">
+        <button class="login-btn" type="submit" name="mode" value="demo">&#128202; Muat Data Contoh (Demo)</button>
+        <button class="login-btn secondary" type="submit" name="mode" value="empty">Mulai dari Data Kosong</button>
+      </div>
+    </form>
+    <div class="demo-hint">
+      "Data Contoh" mengisi aplikasi dengan data ilustrasi (insiden, inspeksi, dst.) supaya Anda bisa langsung melihat cara kerjanya. Semua bisa dihapus lewat menu Pengaturan kapan saja.
+    </div>
+    <div class="setup-import-divider"><span>atau, jika sudah pernah pakai sebelumnya</span></div>
+    <button type="button" class="login-btn setup-import-btn" id="setupImportBtn">&#128229; Import dari File JSON (Data Lama)</button>
+    <input type="file" id="setupImportFile" accept="application/json" class="hidden">
+    <div class="demo-hint">
+      Pindah ke komputer/perangkat baru? Anda tidak perlu isi form ini lagi &mdash; klik tombol di atas dan pilih file <code>hse-omni-pro-data-....json</code> hasil Export dari perangkat lama Anda. Semua data (termasuk profil perusahaan) akan langsung dimuat kembali persis seperti sebelumnya.
+    </div>
+  </div>
+</div>
+
+<!-- ============================ APP SHELL ============================ -->
+<div id="appShell" class="app-shell hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo-badge" id="sidebarLogo"></div>
+      <div class="brand-text">HSE OMNI PRO<small>LOCAL EDITION</small></div>
+    </div>
+    <div class="company-tag" id="sidebarCompanyName"></div>
+    <nav id="navGroups"></nav>
+    <div class="sidebar-footer">
+      <div class="data-card">
+        <div class="dc-title">Data Lokal</div>
+        <div class="dc-sub">Perubahan tersimpan di memori browser. Export sebelum menutup tab.</div>
+        <div class="dc-row">
+          <button class="dc-btn export" id="exportBtn">&#8681; Export JSON</button>
+          <button class="dc-btn import" id="importBtn">&#8679; Import JSON</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json" class="hidden">
+        <button type="button" id="resetDataBtn" class="dc-reset-link">Reset ke data kosong</button>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar" id="userAvatar"></div>
+        <div class="user-meta" id="userMeta"></div>
+        <a class="logout-link" id="logoutBtn" title="Ganti Pengguna Aktif">&#8646;</a>
+      </div>
+      <div class="sidebar-copyright">&copy; HSE OMNI PRO by JS Digital</div>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <button type="button" id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Buka menu navigasi">&#9776;</button>
+      <div class="proyek-select">&#128205; <select id="topbarProjectFilter" class="proyek-select-input" title="Filter data berdasarkan lokasi/proyek"><option value="">Semua Proyek</option></select></div>
+      <div class="search-box">&#128269; <input id="globalSearch" placeholder="Cari data temuan atau ID..." autocomplete="off"></div>
+      <div class="spacer"></div>
+      <a href="https://lynk.id/js.digital/k2ej6d2ddo5l" target="_blank" rel="noopener" class="demo-cta-pill hidden" id="demoCtaPill">MODE DEMO &middot; Beli Versi Lengkap</a>
+      <div class="local-pill">&#9679; 100% LOKAL</div>
+      <div class="bell" id="bellBtn">
+        &#128276;<span class="dot" id="bellDot"></span>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-header">Notifikasi</div>
+          <div id="notifList"></div>
+        </div>
+      </div>
+      <div class="topbar-user">
+        <div class="avatar" id="topbarAvatar"></div>
+        <div class="meta" id="topbarMeta"></div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- Shared "document view" modal, reused by every module (Insiden, Tim, semua modul operasional) -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal-box view-modal-box">
+    <button class="modal-close" data-action="close-modal" data-target="viewModal">&times;</button>
+    <div id="viewModalBody"></div>
+  </div>
+</div>
+
+<!-- Active-user switcher (menggantikan login/password, tidak ada otentikasi nyata) -->
+<div class="modal-overlay" id="userSwitchModal">
+  <div class="modal-box" style="max-width:380px;">
+    <button class="modal-close" data-action="close-modal" data-target="userSwitchModal">&times;</button>
+    <h2>Ganti Pengguna Aktif</h2>
+    <p class="modal-hint">Pilih anggota tim yang sedang memakai aplikasi ini &mdash; tidak perlu password.</p>
+    <div id="userSwitchList"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   HSE OMNI PRO — Local Edition
+   Single-file app: no server, no build step, no network dependency.
+   Data lives in memory only; use Export/Import JSON to persist between
+   sessions. Open this file directly in a browser (double-click) to run.
+   ========================================================================= */
+
+/* ---------------------------- Icons (inline SVG, no external assets) --- */
+const SHIELD_LOGO_SVG = `
+<svg viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd43b"/>
+      <stop offset="100%" stop-color="#f59f00"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 4 L54.5 11.5 V27.5 C54.5 44.5 45.5 55.5 32 60.5 C18.5 55.5 9.5 44.5 9.5 27.5 V11.5 Z" fill="url(#shieldGrad)"/>
+  <path d="M32 9 L49.5 15 V27.5 C49.5 41.5 42 51 32 55.5 C22 51 14.5 41.5 14.5 27.5 V15 Z" fill="none" stroke="#fff" stroke-opacity="0.4" stroke-width="1.5"/>
+  <path d="M21.5 30.5 L28.5 37.5 L43 21.5" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+function paintLogos() {
+  document.getElementById("loginLogo").innerHTML = SHIELD_LOGO_SVG;
+  document.getElementById("sidebarLogo").innerHTML = SHIELD_LOGO_SVG;
+}
+
+/* ---------------------------- Navigation metadata ----------------------- */
+const NAV_GROUPS = [
+  { label: null, links: [
+    { key: "dashboard", label: "Dashboard", icon: "&#128202;" },
+    { key: "performa", label: "Performa HSE", icon: "&#127942;" },
+    { key: "statistik", label: "Statistik KPI", icon: "&#128200;" },
+  ]},
+  { label: "Operasional", links: [
+    { key: "insiden", label: "Insiden", icon: "&#128680;" },
+    { key: "inspeksi", label: "Inspeksi", module: true },
+    { key: "capa", label: "Tindakan Perbaikan (CAPA)", module: true },
+    { key: "audit", label: "Manajemen Audit", module: true },
+    { key: "hiradc", label: "HIRADC & Risiko", module: true },
+    { key: "ptw", label: "Izin Kerja (PTW)", module: true },
+    { key: "legal", label: "Legal & Kepatuhan", module: true },
+    { key: "sertifikasi", label: "SIA/SIO & Sertifikasi", module: true },
+    { key: "csms", label: "Manajemen CSMS", module: true },
+  ]},
+  { label: "Aktivitas", links: [
+    { key: "kalender", label: "Kalender Keselamatan", module: true },
+    { key: "rapat", label: "Rapat HSE", module: true },
+    { key: "pelatihan", label: "Pelatihan", module: true },
+  ]},
+  { label: "Sumber Daya", links: [
+    { key: "inventaris", label: "Inventaris HSE", module: true },
+    { key: "dokumen", label: "Pusat Dokumen", module: true },
+  ]},
+  { label: "Administrasi", links: [
+    { key: "tim", label: "Manajemen Tim", icon: "&#128101;" },
+    { key: "pengaturan", label: "Pengaturan", icon: "&#9881;" },
+  ]},
+];
+const MODULE_LABELS = {};
+NAV_GROUPS.forEach(g => g.links.forEach(l => { if (l.module) MODULE_LABELS[l.key] = l.label; }));
+const SEVERITY_COLORS = { Low: "sev-low", Medium: "sev-medium", High: "sev-high", Critical: "sev-critical" };
+const MONTH_ABBR = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+const MONTH_FULL = ["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
+const RISK_BADGE = { Low: "risk-low", Medium: "risk-medium", High: "risk-high", Extreme: "risk-extreme" };
+const CAL_CATEGORY_COLOR = { Meeting: "#1baf7a", Training: "#eda100", Emergency: "#e34948", Inspection: "#2a78d6", Audit: "#4a3aa7", Umum: "#e87ba4" };
+
+/* ---------------------------- Bespoke per-module field schemas -----------
+   Setiap modul operasional punya field & tampilan sendiri (bukan generik),
+   ditiru dari struktur data & aksi (Lihat/Edit/Hapus) pada web referensi. */
+const STATUS_OPTIONS = ["Open", "In Progress", "Closed", "Scheduled"];
+/* Jenis pekerjaan berisiko tinggi — daftar tunggal yang dipakai bersama oleh
+   modul HIRADC (kajian risiko per jenis pekerjaan) dan PTW (izin kerja per
+   jenis pekerjaan) supaya kategorinya selalu konsisten/selaras di kedua modul. */
+const WORK_TYPES = ["Hot Work", "Working at Height", "Confined Space", "Excavation", "Lifting"];
+const LIKELIHOOD_OPTIONS = ["1 - Sangat Jarang (Rare)", "2 - Jarang (Unlikely)", "3 - Mungkin (Possible)", "4 - Sering (Likely)", "5 - Sangat Sering (Almost Certain)"];
+const SEVERITY_OPTIONS = ["1 - Tidak Signifikan (Insignificant)", "2 - Kecil (Minor)", "3 - Sedang (Moderate)", "4 - Besar (Major)", "5 - Bencana (Catastrophic)"];
+/* Status HIRADC & PTW — disesuaikan dengan web referensi (bukan pakai
+   Open/In Progress/Closed/Scheduled generik seperti modul lain). Referensi
+   tidak punya field status untuk HIRADC (hanya badge "Active" tetap di
+   dokumen), dan PTW punya "Status Persetujuan" dengan 5 pilihan berikut. */
+const HIRADC_STATUS_OPTIONS = ["Aktif", "Tidak Aktif"];
+const HIRADC_STATUS_BADGE = { "Aktif": "doc-active", "Tidak Aktif": "status-inactive" };
+const PTW_STATUS_OPTIONS = ["Pending Approval", "Approved", "Rejected", "Expired", "Closed"];
+const PTW_STATUS_BADGE = { "Pending Approval": "doc-warning", "Approved": "doc-active", "Rejected": "status-rejected", "Expired": "doc-expired", "Closed": "status-closed" };
+/* Sama seperti HIRADC/PTW — status Legal, SIA/SIO & Sertifikasi, dan CSMS di web referensi
+   punya pilihan sendiri-sendiri (bukan status generik Open/In Progress/Closed/Scheduled). */
+const LEGAL_STATUS_OPTIONS = ["Compliant", "In Progress", "Non-Compliant", "N/A"];
+const LEGAL_STATUS_BADGE = { "Compliant": "doc-active", "In Progress": "doc-warning", "Non-Compliant": "status-rejected", "N/A": "status-inactive" };
+const SERTIFIKASI_STATUS_OPTIONS = ["Active", "Near Expiry", "Expired"];
+const SERTIFIKASI_STATUS_BADGE = { "Active": "doc-active", "Near Expiry": "doc-warning", "Expired": "doc-expired" };
+const CSMS_STATUS_OPTIONS = ["Qualified", "Probation", "Blacklisted", "Not Evaluated"];
+const CSMS_STATUS_BADGE = { "Qualified": "doc-active", "Probation": "doc-warning", "Blacklisted": "status-rejected", "Not Evaluated": "status-inactive" };
+const MODULE_SCHEMAS = {
+  inspeksi: {
+    label: "Inspeksi", icon: "&#128269;", docType: "LAPORAN HASIL INSPEKSI", bannerColor: "#2a78d6",
+    fields: [
+      { key: "judul", label: "Judul Inspeksi", type: "text", title: true, col: true, required: true, ph: "Contoh: Inspeksi APD Area Produksi" },
+      { key: "kategori", label: "Kategori Inspeksi", type: "select", options: ["Inspeksi APD","Inspeksi Scaffold","Inspeksi Alat Berat","Inspeksi Kebakaran","Inspeksi Umum"], col: true, sub: true },
+      { key: "tanggal", label: "Tanggal Inspeksi", type: "date", col: true },
+      { key: "lokasi", label: "Lokasi", type: "text", col: true },
+      { key: "pic", label: "Petugas Inspeksi (PIC)", type: "user" },
+      { key: "temuan", label: "Temuan", type: "textarea", ph: "Uraikan temuan hasil inspeksi..." },
+      { key: "rekomendasi", label: "Rekomendasi", type: "textarea", ph: "Rekomendasi tindak lanjut..." },
+      { key: "skor", label: "Nilai Assessment (%)", type: "number", ph: "0-100" },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
+    ],
+  },
+  capa: {
+    label: "Tindakan Perbaikan (CAPA)", icon: "&#128295;", docType: "LAPORAN TINDAKAN PERBAIKAN", bannerColor: "#eb6834",
+    fields: [
+      { key: "judul", label: "Judul Temuan", type: "text", title: true, required: true, ph: "Contoh: Temuan APD Tidak Lengkap" },
+      { key: "finding_code", label: "Kode Temuan", type: "text", ph: "CAPA-001" },
+      { key: "kategori", label: "Kategori", type: "select", options: ["Temuan APD","Housekeeping","Prosedur LOTO","Lainnya"] },
+      { key: "severity", label: "Tingkat Keparahan", type: "select", options: ["Low","Medium","High","Critical"] },
+      { key: "lokasi", label: "Lokasi", type: "text" },
+      { key: "deskripsi", label: "Deskripsi Temuan", type: "textarea" },
+      { key: "tindakan_perbaikan", label: "Tindakan Perbaikan", type: "textarea" },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
+    ],
+  },
+  audit: {
+    label: "Manajemen Audit", icon: "&#128203;", docType: "RINGKASAN AUDIT INTERNAL", bannerColor: "#1baf7a",
+    fields: [
+      { key: "judul_audit", label: "Judul Audit", type: "text", title: true, col: true, required: true, ph: "Contoh: Audit ISO 45001" },
+      { key: "auditor", label: "Auditor", type: "text", col: true },
+      { key: "tanggal", label: "Tanggal Audit", type: "date", col: true },
+      { key: "lokasi", label: "Lokasi / Area Audit", type: "text" },
+      { key: "ruang_lingkup", label: "Ruang Lingkup", type: "textarea" },
+      { key: "temuan", label: "Temuan Audit", type: "textarea" },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
+    ],
+  },
+  hiradc: {
+    label: "HIRADC & Risiko", icon: "&#9888;", docType: "IDENTIFIKASI BAHAYA & PENILAIAN RISIKO", bannerColor: "#e34948",
+    fields: [
+      { key: "aktivitas", label: "Aktivitas Pekerjaan", type: "text", title: true, col: true, required: true, ph: "Contoh: Bekerja di Ketinggian > 2m untuk pemasangan balok..." },
+      { key: "bahaya", label: "Potensi Bahaya (Hazard)", type: "textarea", col: true, sub: true, ph: "Contoh: Jatuh dari ketinggian, Scaffolding roboh" },
+      { key: "dampak", label: "Dampak / Konsekuensi", type: "textarea", ph: "Contoh: Patah tulang, Kematian, Kerusakan Aset" },
+      { key: "likelihood", label: "Likelihood (Peluang)", type: "select", options: LIKELIHOOD_OPTIONS },
+      { key: "severity_n", label: "Severity (Keparahan)", type: "select", options: SEVERITY_OPTIONS },
+      { key: "pengendalian", label: "Langkah Pengendalian (Controls)", type: "textarea" },
+      { key: "lokasi", label: "Lokasi / Proyek", type: "text", col: true },
+      { key: "status", label: "Status", type: "select", options: HIRADC_STATUS_OPTIONS, badgeMap: HIRADC_STATUS_BADGE, col: true, badge: true },
+    ],
+  },
+  ptw: {
+    label: "Izin Kerja (PTW)", icon: "&#128737;", docType: "SURAT IZIN KERJA AMAN", bannerColor: "#eda100",
+    fields: [
+      { key: "permit_code", label: "Nomor Izin (Permit Code)", type: "text", title: true, col: true, required: true, ph: "PTW-2026-001" },
+      { key: "jenis_pekerjaan", label: "Tipe Izin Kerja", type: "select", options: WORK_TYPES, col: true, sub: true },
+      { key: "lokasi", label: "Lokasi Spesifik", type: "text", col: true, ph: "Contoh: Area Tangki T-102" },
+      { key: "berlaku_dari", label: "Berlaku Dari", type: "date" },
+      { key: "berlaku_sampai", label: "Berlaku Sampai", type: "date", col: true },
+      { key: "deskripsi", label: "Deskripsi Pekerjaan", type: "textarea" },
+      { key: "pengendalian", label: "Kontrol Risiko / Checklist Keamanan", type: "textarea" },
+      { key: "pemohon", label: "Nama Pemohon (Applicant)", type: "user" },
+      { key: "pic_lapangan", label: "Nama PIC Lapangan", type: "user" },
+      { key: "disetujui_oleh", label: "Disetujui Oleh (Authorized By)", type: "user" },
+      { key: "status", label: "Status Persetujuan", type: "select", options: PTW_STATUS_OPTIONS, badgeMap: PTW_STATUS_BADGE, col: true, badge: true },
+    ],
+  },
+  legal: {
+    label: "Legal & Kepatuhan", icon: "&#9878;", docType: "CATATAN KEPATUHAN REGULASI", bannerColor: "#4a3aa7",
+    fields: [
+      { key: "nama_regulasi", label: "Nama Regulasi / Dokumen", type: "text", title: true, col: true, required: true },
+      { key: "kategori", label: "Kategori", type: "select", options: ["Izin Lingkungan","Sertifikat Laik Operasi","Laporan P2K3","Perizinan K3","Lainnya"], col: true, sub: true },
+      { key: "otoritas", label: "Otoritas Penerbit", type: "text" },
+      { key: "lokasi", label: "Lokasi / Area", type: "text" },
+      { key: "persyaratan", label: "Persyaratan (Requirement)", type: "textarea" },
+      { key: "pic_auditor", label: "PIC / Auditor", type: "user" },
+      { key: "tenggat_waktu", label: "Tenggat Waktu (Deadline)", type: "date", col: true },
+      { key: "status", label: "Status Kepatuhan", type: "select", options: LEGAL_STATUS_OPTIONS, badgeMap: LEGAL_STATUS_BADGE, col: true, badge: true },
+    ],
+    statCards: rows => [
+      { label: "Total Register", value: rows.length, icon: "&#128203;", color: "violet" },
+      { label: "Compliant", value: rows.filter(r=>r.data.status==="Compliant").length, icon: "&#9989;", color: "green" },
+      { label: "In Progress", value: rows.filter(r=>r.data.status==="In Progress").length, icon: "&#9203;", color: "amber" },
+      { label: "Non-Compliant", value: rows.filter(r=>r.data.status==="Non-Compliant").length, icon: "&#10060;", color: "red" },
+    ],
+  },
+  sertifikasi: {
+    label: "SIA/SIO & Sertifikasi", icon: "&#127891;", docType: "CATATAN SERTIFIKASI ALAT/OPERATOR", bannerColor: "#008300",
+    fields: [
+      { key: "nama_alat_operator", label: "Nama Alat / Operator", type: "text", title: true, col: true, required: true },
+      { key: "tipe", label: "Tipe Sertifikat", type: "select", options: ["SIA (Alat)","SIO (Operator)","Sertifikat Kompetensi"], col: true, sub: true },
+      { key: "kategori", label: "Kategori", type: "text" },
+      { key: "no_seri", label: "No. Seri / No. Sertifikat", type: "text", col: true },
+      { key: "proyek_lokasi", label: "Proyek / Lokasi", type: "text" },
+      { key: "pic_operator", label: "PIC / Operator", type: "user" },
+      { key: "petugas_pemeriksa", label: "Petugas Pemeriksa", type: "user" },
+      { key: "tanggal_kadaluarsa", label: "Tanggal Kadaluarsa", type: "date", col: true },
+      { key: "status", label: "Status Validitas", type: "select", options: SERTIFIKASI_STATUS_OPTIONS, badgeMap: SERTIFIKASI_STATUS_BADGE, col: true, badge: true },
+    ],
+    statCards: rows => [
+      { label: "Total Sertifikasi", value: rows.length, icon: "&#128187;", color: "violet" },
+      { label: "Status Active", value: rows.filter(r=>r.data.status==="Active").length, icon: "&#9989;", color: "green" },
+      { label: "Near Expiry", value: rows.filter(r=>r.data.status==="Near Expiry").length, icon: "&#9203;", color: "amber" },
+      { label: "Expired", value: rows.filter(r=>r.data.status==="Expired").length, icon: "&#10060;", color: "red" },
+    ],
+  },
+  csms: {
+    label: "Manajemen CSMS", icon: "&#127959;", docType: "PROFIL KUALIFIKASI KONTRAKTOR", bannerColor: "#1c3524",
+    fields: [
+      { key: "nama_kontraktor", label: "Nama Kontraktor", type: "text", title: true, col: true, required: true },
+      { key: "bidang_kategori", label: "Bidang / Kategori", type: "text", col: true, sub: true },
+      { key: "email", label: "Email PIC", type: "text" },
+      { key: "telepon", label: "Telepon", type: "text" },
+      { key: "alamat", label: "Alamat", type: "textarea" },
+      { key: "location_site", label: "Lokasi / Site", type: "text", col: true },
+      { key: "skor_hse", label: "Skor HSE", type: "number" },
+      { key: "terakhir_audit", label: "Terakhir Audit", type: "date" },
+      { key: "batas_berlaku", label: "Batas Berlaku Kualifikasi", type: "date", col: true },
+      { key: "pic_auditor", label: "PIC Auditor", type: "user" },
+      { key: "status", label: "Status Kualifikasi", type: "select", options: CSMS_STATUS_OPTIONS, badgeMap: CSMS_STATUS_BADGE, col: true, badge: true },
+    ],
+    statCards: rows => [
+      { label: "Total Kontraktor", value: rows.length, icon: "&#128101;", color: "violet" },
+      { label: "Status Qualified", value: rows.filter(r=>r.data.status==="Qualified").length, icon: "&#9989;", color: "green" },
+      { label: "Dalam Masa Percobaan", value: rows.filter(r=>r.data.status==="Probation").length, icon: "&#9203;", color: "amber" },
+      { label: "Daftar Hitam", value: rows.filter(r=>r.data.status==="Blacklisted").length, icon: "&#10060;", color: "red" },
+    ],
+  },
+  kalender: {
+    label: "Kalender Keselamatan", icon: "&#128197;", docType: "AGENDA KESELAMATAN KERJA", bannerColor: "#1baf7a",
+    fields: [
+      { key: "nama_kegiatan", label: "Nama Kegiatan", type: "text", title: true, required: true, ph: "Meeting Project..." },
+      { key: "tanggal_mulai", label: "Tanggal Mulai", type: "date", required: true },
+      { key: "tanggal_selesai", label: "Tanggal Selesai", type: "date", required: true },
+      { key: "kategori", label: "Kategori / Label Kegiatan", type: "select", options: ["Meeting","Training","Emergency","Inspection","Audit","Umum"] },
+      { key: "deskripsi", label: "Deskripsi / Catatan", type: "textarea" },
+      { key: "lokasi", label: "Lokasi Kegiatan", type: "text", ph: "Contoh: Site Office / Workshop" },
+      { key: "pic", label: "Penanggung Jawab (PIC)", type: "user" },
+    ],
+  },
+  rapat: {
+    label: "Rapat HSE", icon: "&#128172;", docType: "RANGKUMAN PERTEMUAN K3", bannerColor: "#008300",
+    fields: [
+      { key: "judul_rapat", label: "Judul Rapat", type: "text", title: true, col: true, required: true },
+      { key: "deskripsi", label: "Deskripsi / Agenda", type: "textarea", col: true, sub: true },
+      { key: "tanggal", label: "Tanggal", type: "date", col: true },
+      { key: "jam", label: "Jam", type: "text", ph: "08:00-09:00" },
+      { key: "lokasi", label: "Lokasi", type: "text", col: true },
+      { key: "lokasi_penyimpanan", label: "Lokasi Penyimpanan Dokumen", type: "text" },
+      { key: "petugas_pemeriksa", label: "Petugas Pemeriksa (PIC)", type: "user" },
+      { key: "notulis", label: "Petugas / Notulis (PIC)", type: "user" },
+      { key: "rangkuman", label: "Rangkuman Hasil Rapat", type: "textarea", col: true },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
+    ],
+  },
+  pelatihan: {
+    label: "Pelatihan", icon: "&#127919;", docType: "CATATAN PELATIHAN PERSONEL", bannerColor: "#eb6834",
+    fields: [
+      { key: "judul", label: "Judul Pelatihan", type: "text", title: true, col: true, required: true },
+      { key: "deskripsi", label: "Deskripsi Pelatihan", type: "textarea", col: true, sub: true },
+      { key: "tanggal", label: "Tanggal", type: "date", col: true },
+      { key: "waktu", label: "Waktu", type: "text", ph: "08:00 - 12:00" },
+      { key: "lokasi", label: "Lokasi", type: "text", col: true },
+      { key: "instruktur", label: "Petugas / Instruktur (PIC)", type: "user" },
+      { key: "jumlah_peserta", label: "Jumlah Peserta", type: "number" },
+      { key: "daftar_peserta", label: "Daftar Nama Peserta", type: "textarea", ph: "Gunakan koma atau baris baru" },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
+    ],
+  },
+  inventaris: {
+    label: "Inventaris HSE", icon: "&#128230;", docType: "CATATAN ASET & INVENTARIS", bannerColor: "#2a78d6",
+    fields: [
+      { key: "nama_barang", label: "Nama Barang / Aset", type: "text", title: true, col: true, required: true },
+      { key: "tipe", label: "Tipe Inventaris", type: "select", options: ["Perlengkapan Keselamatan","Alat Berat","Bahan Kimia","Peralatan Medis"], col: true, sub: true },
+      { key: "jumlah", label: "Jumlah (Qty)", type: "number", col: true },
+      { key: "lokasi", label: "Lokasi", type: "text", col: true },
+      { key: "kondisi", label: "Kondisi", type: "select", options: ["Baik","Rusak","Perlu Perbaikan"], col: true, badge: true, badgeMap: { Baik: "kondisi-baik", Rusak: "kondisi-rusak", "Perlu Perbaikan": "kondisi-perlu-perbaikan" } },
+      { key: "catatan", label: "Catatan Tambahan", type: "textarea" },
+      { key: "pic", label: "Petugas (PIC)", type: "user" },
+    ],
+  },
+  dokumen: {
+    label: "Pusat Dokumen", icon: "&#128196;", docType: "ARSIP DOKUMEN K3", bannerColor: "#2a78d6",
+    fields: [
+      { key: "judul_dokumen", label: "Judul Dokumen", type: "text", title: true, required: true, ph: "Contoh: SOP_Bekerja_di_Ketinggian.pdf" },
+      { key: "deskripsi", label: "Deskripsi & Ruang Lingkup", type: "textarea" },
+      { key: "kategori", label: "Kategori Dokumen", type: "select", options: ["Dokumen Prosedur (SOP)","Form / Template","Laporan","Kebijakan","Manual"] },
+      { key: "tanggal_upload", label: "Tanggal Upload", type: "date" },
+      { key: "otoritas_pic", label: "Otoritas / Petugas (PIC)", type: "user" },
+      { key: "masa_berlaku", label: "Masa Berlaku Dokumen (Expiry)", type: "date" },
+      { key: "lokasi_proyek", label: "Lokasi / Proyek Terkait", type: "text", ph: "Nama Lokasi/Site..." },
+      { key: "status", label: "Status", type: "select", options: ["Active","Expired","Warning"] },
+    ],
+  },
+};
+
+/* ---------------------------- DEMO MODE ----------------------------------
+   Build ini adalah versi DEMO untuk dicoba publik (mis. di-hosting Railway).
+   Semua fitur bisa dijelajahi dengan data contoh, TAPI aksi "Tambah Data" baru
+   diarahkan ke halaman pembelian, bukan benar-benar menyimpan data baru.
+   Build yang dijual/didownload customer TIDAK memakai flag ini (DEMO_MODE=false). */
+const DEMO_MODE = true;
+const DEMO_PURCHASE_URL = "https://lynk.id/js.digital/k2ej6d2ddo5l";
+function demoBlockAdd() {
+  if (!DEMO_MODE) return false;
+  window.open(DEMO_PURCHASE_URL, "_blank", "noopener");
+  FLASH = { type: "warning", message: "Ini adalah versi DEMO — menambah data baru hanya tersedia di versi lengkap. Silakan lanjutkan pembelian di tab yang baru terbuka." };
+  render();
+  return true;
+}
+
+/* ---------------------------- In-memory data store ----------------------- */
+let DATA = null;
+let CURRENT_USER_ID = null;
+let PENDING_FILTER = null; // dipakai dashboard untuk "lompat & filter" ke halaman Insiden
+let CURRENT_VIEW = null; // { kind, id } dari record yang sedang terbuka di modal Lihat — dipakai untuk lampiran berkas
+let TOPBAR_PROJECT_FILTER = ""; // nilai lokasi/proyek terpilih di dropdown "Proyek" pada topbar, "" = Semua Proyek
+let TOPBAR_SEARCH_FILTER = ""; // teks pencarian global di topbar — live-filter halaman daftar yang sedang aktif
+const LOCATION_FIELD_KEYS = ["lokasi", "location_site", "proyek_lokasi", "lokasi_proyek"]; // kunci field lokasi/proyek di berbagai skema modul
+let COMPANY = null;
+let PENDING_COMPANY_LOGO = null;
+const COMPANY_STORAGE_KEY = "hseOmniProCompany";
+function loadCompany() {
+  try { const raw = localStorage.getItem(COMPANY_STORAGE_KEY); COMPANY = raw ? JSON.parse(raw) : null; }
+  catch { COMPANY = null; }
+}
+function saveCompany() {
+  try { localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(COMPANY)); } catch { /* private mode etc — abaikan, tetap jalan di memori */ }
+}
+let FLASH = null; // {type, message}
+
+function emptyData() {
+  return { users: [], projects: [], incidents: [], generic: [], next_id: { users: 1, projects: 1, incidents: 1, generic: 1 } };
+}
+
+function nextId(col) {
+  const id = DATA.next_id[col];
+  DATA.next_id[col] = id + 1;
+  return id;
+}
+
+/* Mengisi DATA dengan data ilustrasi (proyek/insiden/modul operasional). Dipanggil
+   hanya jika pengguna memilih "Muat Data Contoh" saat Setup Perusahaan, atau lewat
+   menu Pengaturan. Mengasumsikan DATA.users sudah berisi minimal 1 akun (PIC) —
+   tidak lagi membuat akun demo sendiri. */
+function seedDemoContent() {
+  const rnd = mulberry32(42);
+  const projectsNames = ["Zona Parkir Utara","Area Perakitan","Gudang Bahan Baku","Gudang Sparepart","Gudang Distribusi","Kantor Pusat","Ruang Laboratorium","Lantai 2 Produksi","Lantai Dasar","Lantai Administrasi","Lini Produksi 1","Proyek Jalur Kereta Fase 2","Ruang Operasional","Klinik Kesehatan Kerja","Ruang Penyimpanan Kimia","Ruang Rapat Utama"];
+  const severities = ["Low","Medium","High","Critical"];
+  const severityWeights = [35,30,25,10];
+  const incidentStatuses = ["Open","In Progress","Closed"];
+  const categories = ["Near Miss","Kecelakaan Kerja","Kerusakan Alat","Kondisi Tidak Aman"];
+  const incidentTitles = ["Pekerja Terpapar Zat Kimia Berbahaya","Insiden Terjatuh dari Ketinggian","Kelalaian Penggunaan APD","Tumpahan Cairan Kimia di Area Kerja","Instalasi Kabel Listrik Terbuka","Permukaan Lantai Licin di Area Produksi","Forklift Nyaris Bersinggungan dengan Pekerja","Kondisi APD Tidak Layak Pakai","Kebocoran Gas di Ruang Laboratorium","Percikan Api pada Panel Distribusi Listrik"];
+  const genericTitles = {
+    inspeksi: ["Pemeriksaan APD","Pemeriksaan Perancah (Scaffold)","Pemeriksaan Alat Berat","Pemeriksaan Sistem Proteksi Kebakaran"],
+    audit: ["Audit Sistem ISO 45001","Audit Internal K3","Audit Kepatuhan Vendor"],
+    hiradc: WORK_TYPES.map(t => `Kajian Risiko ${t}`),
+    ptw: WORK_TYPES.map(t => `Izin Kerja ${t}`),
+    legal: ["Izin Pengelolaan Lingkungan","Sertifikat Kelayakan Operasi","Laporan Rutin P2K3"],
+    sertifikasi: ["Sertifikasi Operator Forklift","Sertifikasi Operator Crane","Sertifikat Ahli K3 Umum"],
+    csms: ["Evaluasi CSMS Mitra A","Evaluasi CSMS Mitra B","Asesmen CSMS Vendor"],
+    rapat: ["Pertemuan Rutin Bulanan K3","Rapat Koordinasi P2K3","Rapat Tinjauan Manajemen K3"],
+    pelatihan: ["Pelatihan Penggunaan APD","Pelatihan Penanggulangan Kebakaran","Pelatihan Pertolongan Pertama"],
+    inventaris: ["Helm Pelindung","Sarung Tangan Kerja","Tabung Pemadam Api 6kg"],
+    dokumen: ["Kebijakan Keselamatan Kerja Perusahaan","Panduan Sistem Manajemen K3","Prosedur Kerja di Ketinggian"],
+  };
+
+  const projectIdByName = {};
+  projectsNames.forEach(name => { const p = { id: nextId("projects"), name }; DATA.projects.push(p); projectIdByName[name] = p.id; });
+
+  // Anggota tim contoh (khusus mode Data Contoh) — supaya field Pemohon/PIC/Auditor
+  // dst di data ilustrasi bervariasi, bukan cuma satu nama PIC asli berulang-ulang.
+  // Roster ini murni ilustratif, ikut hilang saat halaman dimuat ulang (sama seperti
+  // data lain) dan tidak menambah "akun login" apa pun — tidak ada login di aplikasi ini.
+  const demoTeammates = [
+    { name: "Ahmad Fauzi", role: "Safety Officer" },
+    { name: "Siti Rahma", role: "Safety Supervisor" },
+    { name: "Budi Santoso", role: "Koordinator Lapangan" },
+    { name: "Dewi Lestari", role: "Petugas K3" },
+    { name: "Rian Hidayat", role: "HSE Inspector" },
+  ];
+  demoTeammates.forEach(t => {
+    DATA.users.push({
+      id: nextId("users"), name: t.name, email: "", phone: "", role: t.role, status: "Active",
+      competency_expiry: isoDate(addDays(new Date(), 30 + Math.floor(rnd() * 300))), points: Math.floor(rnd() * 50),
+    });
+  });
+
+  const userIds = DATA.users.map(u => u.id);
+
+  for (let i = 0; i < 38; i++) {
+    const title = pick(rnd, incidentTitles);
+    const project = pick(rnd, projectsNames);
+    const severity = weightedPick(rnd, severities, severityWeights);
+    const status = pick(rnd, incidentStatuses);
+    const occurred = addDays(new Date(), -Math.floor(rnd() * 220));
+    occurred.setHours(6 + Math.floor(rnd() * 12), pick(rnd, [0, 15, 30, 45]), 0, 0);
+    const pic = pick(rnd, userIds);
+    DATA.incidents.push({
+      id: nextId("incidents"), name: title, category: pick(rnd, categories), severity,
+      description: `Kronologi kejadian ${title.toLowerCase()} di area ${project}.`,
+      project_id: projectIdByName[project], status, occurred_at: isoDateTime(occurred),
+      pic_id: pic, root_cause: `Analisis akar masalah untuk ${title.toLowerCase()}.`,
+      corrective_action: "Tindakan perbaikan segera telah dilakukan di lapangan.",
+      created_by: pic, created_at: isoDateTime(occurred),
+    });
+  }
+
+  Object.entries(genericTitles).forEach(([mod, titles]) => {
+    const n = 4 + Math.floor(rnd() * 5);
+    seedGenericModule(rnd, mod, n, titles, userIds, projectsNames);
+  });
+  seedCapa(rnd, 5 + Math.floor(rnd() * 4), userIds, projectsNames);
+  seedKalender(rnd, 10 + Math.floor(rnd() * 6), userIds, projectsNames);
+}
+
+/* ---- schema-driven seeding helpers for the 13 bespoke operational modules ---- */
+function randFieldValue(rnd, f, userIds, projectsNames, idx) {
+  if (f.type === "select") return pick(rnd, f.options);
+  if (f.type === "user") return pick(rnd, userIds);
+  if (f.type === "date") return isoDate(addDays(new Date(), Math.floor(rnd() * 160) - 60));
+  if (f.type === "number") return Math.floor(rnd() * 100);
+  if (LOCATION_FIELD_KEYS.includes(f.key)) return pick(rnd, projectsNames);
+  const codeKeys = { permit_code: "PTW", finding_code: "CAPA", no_seri: "SN" };
+  if (codeKeys[f.key]) return `${codeKeys[f.key]}-${String(idx).padStart(3, "0")}`;
+  if (f.key === "email") return `kontraktor${idx}@vendor.com`;
+  if (f.key === "telepon") return `08${100000000 + Math.floor(rnd() * 899999999)}`;
+  if (f.type === "textarea") return `Catatan ${f.label.toLowerCase()} untuk data ke-${idx}.`;
+  return `${f.label} #${idx}`;
+}
+
+function seedGenericModule(rnd, mod, n, titlesList, userIds, projectsNames) {
+  const schema = MODULE_SCHEMAS[mod];
+  const titleField = schema.fields.find(f => f.title);
+  const dateField = schema.fields.find(f => f.type === "date");
+  const statusField = schema.fields.find(f => f.key === "status");
+  for (let i = 0; i < n; i++) {
+    const data = {};
+    const titleText = `${pick(rnd, titlesList)} #${i + 1}`;
+    schema.fields.forEach(f => {
+      data[f.key] = (f === titleField) ? titleText : randFieldValue(rnd, f, userIds, projectsNames, i + 1);
+    });
+    if (mod === "ptw") {
+      // Samakan "Tipe Izin Kerja" dengan jenis kerja yang ada di judul, supaya
+      // konsisten dengan kajian risiko HIRADC untuk jenis pekerjaan yang sama.
+      const matchedType = WORK_TYPES.find(t => titleText.includes(t));
+      if (matchedType) data.jenis_pekerjaan = matchedType;
+      // Pastikan "Berlaku Sampai" selalu setelah "Berlaku Dari" (masa berlaku izin wajar).
+      if (data.berlaku_dari) data.berlaku_sampai = isoDate(addDays(new Date(data.berlaku_dari), 3 + Math.floor(rnd() * 27)));
+    }
+    if (mod === "hiradc") {
+      const l = parseInt(data.likelihood, 10) || 1, s = parseInt(data.severity_n, 10) || 1;
+      const score = l * s;
+      data.score = score;
+      data.risk_level = score > 15 ? "Extreme" : score >= 8 ? "High" : score >= 4 ? "Medium" : "Low";
+    }
+    if (mod === "dokumen") {
+      if (rnd() < 0.4) data.masa_berlaku = "";
+      const todayStr = isoDate(new Date()), in30Str = isoDate(addDays(new Date(), 30));
+      data.status = !data.masa_berlaku ? "Active" : data.masa_berlaku < todayStr ? "Expired" : data.masa_berlaku <= in30Str ? "Warning" : "Active";
+    }
+    DATA.generic.push({
+      id: nextId("generic"), module: mod, title: data[titleField.key],
+      status: statusField ? data.status : "Open",
+      record_date: dateField ? data[dateField.key] : isoDate(new Date()),
+      data, created_by: pick(rnd, userIds), created_at: isoDateTime(new Date()),
+    });
+  }
+}
+
+function seedCapa(rnd, n, userIds, projectsNames) {
+  const titles = ["Temuan Kelengkapan APD","Temuan Kerapian Area Kerja","Temuan Prosedur LOTO"];
+  const kats = ["Temuan APD","Housekeeping","Prosedur LOTO","Lainnya"];
+  const sevs = ["Low","Medium","High","Critical"];
+  for (let i = 0; i < n; i++) {
+    const status = pick(rnd, STATUS_OPTIONS);
+    const data = {
+      judul: `${pick(rnd, titles)} #${i + 1}`, finding_code: `CAPA-${String(i + 1).padStart(3, "0")}`,
+      kategori: pick(rnd, kats), severity: pick(rnd, sevs), lokasi: pick(rnd, projectsNames),
+      deskripsi: `Catatan temuan lapangan ke-${i + 1} yang perlu ditindaklanjuti.`,
+      tindakan_perbaikan: "Rencana perbaikan sudah disusun dan sedang dikerjakan tim terkait.",
+      status,
+    };
+    DATA.generic.push({
+      id: nextId("generic"), module: "capa", title: data.judul, status,
+      record_date: isoDate(addDays(new Date(), -Math.floor(rnd() * 120))),
+      data, created_by: pick(rnd, userIds), created_at: isoDateTime(new Date()),
+    });
+  }
+}
+
+function seedKalender(rnd, n, userIds, projectsNames) {
+  const cats = ["Meeting","Training","Emergency","Inspection","Audit","Umum"];
+  const kegiatanNames = ["Pelatihan Petugas Pemadam","Simulasi Tanggap Darurat","Agenda Kegiatan K3","Pemeriksaan Perancah","Pertemuan Rutin Mingguan","Audit Internal K3","Briefing Keselamatan Harian"];
+  for (let i = 0; i < n; i++) {
+    const start = addDays(new Date(), Math.floor(rnd() * 80) - 40);
+    const end = addDays(start, Math.floor(rnd() * 2));
+    const data = {
+      nama_kegiatan: `${pick(rnd, kegiatanNames)} #${i + 1}`,
+      tanggal_mulai: isoDate(start), tanggal_selesai: isoDate(end),
+      kategori: pick(rnd, cats), deskripsi: `Catatan kegiatan HSE ke-${i + 1}.`,
+      lokasi: pick(rnd, projectsNames), pic: pick(rnd, userIds),
+    };
+    DATA.generic.push({
+      id: nextId("generic"), module: "kalender", title: data.nama_kegiatan, status: "Open",
+      record_date: data.tanggal_mulai, data, created_by: pick(rnd, userIds), created_at: isoDateTime(new Date()),
+    });
+  }
+}
+
+/* ---------------------------- small utils -------------------------------- */
+function mulberry32(seed) { return function() { let t = seed += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function pick(rnd, arr) { return arr[Math.floor(rnd() * arr.length)]; }
+function weightedPick(rnd, arr, weights) { const total = weights.reduce((a,b)=>a+b,0); let r = rnd() * total; for (let i=0;i<arr.length;i++){ if (r < weights[i]) return arr[i]; r -= weights[i]; } return arr[arr.length-1]; }
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function pad(n) { return String(n).padStart(2, "0"); }
+function isoDate(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function isoDateTime(d) { return `${isoDate(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`; }
+function parseDT(s) { if (!s) return null; const d = new Date(s); return isNaN(d) ? null : d; }
+function fmtDateTime(s) { const d = parseDT(s); if (!d) return s || "-"; return `${isoDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function slug(s) { return String(s).toLowerCase().replace(/\s+/g, "-"); }
+
+/* ==================== ICON SYSTEM (SVG line-icons, replaces emoji) ==================== */
+const ICONS = {
+  "file": '<path d="M5 2h6l4 4v12H5z"/><path d="M11 2v4h4"/><line x1="7.5" y1="11" x2="12.5" y2="11"/><line x1="7.5" y1="14" x2="12.5" y2="14"/>',
+  "alert-triangle": '<path d="M10 3l8 14H2z"/><line x1="10" y1="8" x2="10" y2="12.3"/><circle cx="10" cy="14.7" r="0.9" fill="currentColor" stroke="none"/>',
+  "alert-circle": '<circle cx="10" cy="10" r="7.5"/><line x1="10" y1="6" x2="10" y2="11"/><circle cx="10" cy="14" r="0.9" fill="currentColor" stroke="none"/>',
+  "eye": '<path d="M2 10s3-5.5 8-5.5S18 10 18 10s-3 5.5-8 5.5S2 10 2 10z"/><circle cx="10" cy="10" r="2.4"/>',
+  "edit": '<path d="M12.5 3.5l4 4L6 18H2v-4z"/><line x1="11" y1="5" x2="15" y2="9"/>',
+  "check-circle": '<circle cx="10" cy="10" r="7.5"/><polyline points="6.5,10.2 9,12.7 13.7,7.5"/>',
+  "clock": '<circle cx="10" cy="10" r="7.5"/><polyline points="10,5.5 10,10 13.5,12"/>',
+  "trash": '<line x1="3.5" y1="6" x2="16.5" y2="6"/><path d="M6 6V4.5A1.5 1.5 0 0 1 7.5 3h5A1.5 1.5 0 0 1 14 4.5V6"/><path d="M5.5 6l0.7 10a1.5 1.5 0 0 0 1.5 1.4h4.6a1.5 1.5 0 0 0 1.5-1.4l0.7-10"/><line x1="8.3" y1="9" x2="8.3" y2="14"/><line x1="11.7" y1="9" x2="11.7" y2="14"/>',
+  "bar-chart": '<rect x="3" y="10" width="3" height="7" fill="currentColor" stroke="none"/><rect x="8.5" y="5" width="3" height="12" fill="currentColor" stroke="none"/><rect x="14" y="12" width="3" height="5" fill="currentColor" stroke="none"/>',
+  "user": '<circle cx="10" cy="7" r="3.2"/><path d="M3.5 17c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6"/>',
+  "users": '<circle cx="7.5" cy="7" r="3"/><path d="M2 17c0-3.2 2.5-5.5 5.5-5.5S13 13.8 13 17"/><path d="M13.5 6.5a2.6 2.6 0 1 1 0 5.2"/><path d="M15 11.7c2 0.4 3 2 3 5.3h-2.3"/>',
+  "shield": '<path d="M10 2.5l6.5 2.5v5c0 4.5-2.8 7.7-6.5 9.5-3.7-1.8-6.5-5-6.5-9.5v-5z"/><polyline points="7,10 9.2,12.2 13.3,8"/>',
+  "x-circle": '<circle cx="10" cy="10" r="7.5"/><line x1="7" y1="7" x2="13" y2="13"/><line x1="13" y1="7" x2="7" y2="13"/>',
+  "scale": '<line x1="10" y1="3" x2="10" y2="16"/><line x1="4" y1="6" x2="16" y2="6"/><path d="M4 6l-2.5 5h5z"/><path d="M16 6l-2.5 5h5z"/><line x1="6.5" y1="17.5" x2="13.5" y2="17.5"/>',
+  "search": '<circle cx="8.5" cy="8.5" r="5.5"/><line x1="12.7" y1="12.7" x2="17.5" y2="17.5"/>',
+  "camera": '<path d="M3 6.5h3l1.3-2h5.4l1.3 2h3v9.5H3z"/><circle cx="10" cy="11" r="3"/>',
+  "clipboard": '<rect x="4" y="4" width="12" height="14" rx="1"/><rect x="7" y="2.3" width="6" height="3" rx="0.8"/><line x1="6.5" y1="9.5" x2="13.5" y2="9.5"/><line x1="6.5" y1="12.5" x2="13.5" y2="12.5"/><line x1="6.5" y1="15.5" x2="11" y2="15.5"/>',
+  "graduation-cap": '<path d="M10 4l9 4-9 4-9-4z"/><path d="M5.5 10v4c0 1.2 2 2.5 4.5 2.5s4.5-1.3 4.5-2.5v-4"/><line x1="19" y1="8" x2="19" y2="13.5"/>',
+  "arrow-down": '<line x1="10" y1="3.5" x2="10" y2="15"/><polyline points="5.5,10.5 10,15 14.5,10.5"/>',
+  "arrow-up": '<line x1="10" y1="16.5" x2="10" y2="5"/><polyline points="5.5,9.5 10,5 14.5,9.5"/>',
+  "arrow-left": '<line x1="16.5" y1="10" x2="4" y2="10"/><polyline points="8,5.5 4,10 8,14.5"/>',
+  "map-pin": '<path d="M10 18s6-6.5 6-10.5A6 6 0 0 0 4 7.5C4 11.5 10 18 10 18z"/><circle cx="10" cy="7.3" r="2"/>',
+  "trending-up": '<polyline points="3,14 8,9 11.5,12 17,5.5"/><polyline points="12.5,5.5 17,5.5 17,10"/>',
+  "calendar": '<rect x="3" y="4.5" width="14" height="12.5" rx="1"/><line x1="3" y1="8.5" x2="17" y2="8.5"/><line x1="6.5" y1="2.5" x2="6.5" y2="6"/><line x1="13.5" y1="2.5" x2="13.5" y2="6"/>',
+  "trophy": '<path d="M6 3h8v5a4 4 0 0 1-8 0z"/><path d="M6 4H3.5v1.5A2.5 2.5 0 0 0 6 8"/><path d="M14 4h2.5v1.5A2.5 2.5 0 0 1 14 8"/><line x1="10" y1="12" x2="10" y2="15"/><line x1="7" y1="17.5" x2="13" y2="17.5"/><line x1="10" y1="15" x2="10" y2="17.5"/>',
+  "settings": '<circle cx="10" cy="10" r="2.6"/><path d="M10 3v2.2M10 14.8V17M17 10h-2.2M5.2 10H3M14.9 5.1l-1.5 1.5M6.6 13.4l-1.5 1.5M14.9 14.9l-1.5-1.5M6.6 6.6L5.1 5.1"/>',
+  "menu": '<line x1="3" y1="6" x2="17" y2="6"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="14" x2="17" y2="14"/>',
+  "printer": '<path d="M6 8V3.5h8V8"/><rect x="3" y="8" width="14" height="6" rx="1"/><rect x="6" y="12.5" width="8" height="4.5"/>',
+  "wrench": '<path d="M13.5 3a4 4 0 0 0-5 5L3 13.5 6.5 17 12 11.5a4 4 0 0 0 5-5l-2.7 2.7-2-2z"/>',
+  "bell": '<path d="M10 3.5a4.5 4.5 0 0 0-4.5 4.5v3l-1.5 3h12l-1.5-3v-3A4.5 4.5 0 0 0 10 3.5z"/><path d="M8.3 16.5a1.8 1.8 0 0 0 3.4 0"/>',
+  "package": '<path d="M10 3l7 3.5v7L10 17l-7-3.5v-7z"/><line x1="3" y1="6.5" x2="10" y2="10"/><line x1="10" y1="10" x2="17" y2="6.5"/><line x1="10" y1="10" x2="10" y2="17"/>',
+  "inbox-download": '<line x1="10" y1="2.5" x2="10" y2="10"/><polyline points="6.5,7 10,10.5 13.5,7"/><path d="M3 12v3.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V12"/>',
+  "message-circle": '<path d="M3 10a7 7 0 1 1 3.2 5.9L3 17l1.2-3.6A7 7 0 0 1 3 10z"/>',
+  "building": '<rect x="4" y="3" width="12" height="14.5"/><rect x="6.3" y="5.5" width="2" height="2"/><rect x="11.7" y="5.5" width="2" height="2"/><rect x="6.3" y="9.5" width="2" height="2"/><rect x="11.7" y="9.5" width="2" height="2"/><rect x="8.3" y="13.5" width="3.4" height="4"/>',
+  "refresh": '<path d="M15.5 5.5A6.5 6.5 0 1 0 17 10"/><polyline points="17,4 17,8 13,8"/>',
+  "table": '<rect x="3" y="4" width="14" height="12"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="12.5" x2="17" y2="12.5"/><line x1="8.3" y1="4" x2="8.3" y2="16"/><line x1="12.7" y1="4" x2="12.7" y2="16"/>',
+  "target": '<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="4"/><circle cx="10" cy="10" r="1" fill="currentColor" stroke="none"/>',
+};
+function icon(name, cls) {
+  const body = ICONS[name];
+  if (!body) return "";
+  return `<svg class="ico${cls ? " " + cls : ""}" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+}
+/* Emoji glyph -> icon name, used to auto-convert any emoji still produced by older code paths
+   or third-party-looking strings into the SVG icon set above, so the whole app renders with a
+   single consistent line-icon style instead of mixed platform emoji fonts. */
+const EMOJI_ICON_MAP = {
+  "\u{1F4C4}": "file", "⚠️": "alert-triangle", "⚠": "alert-triangle",
+  "\u{1F441}️": "eye", "\u{1F441}": "eye", "✏️": "edit", "✏": "edit",
+  "✅": "check-circle", "⏳": "clock", "\u{1F5D1}️": "trash", "\u{1F5D1}": "trash",
+  "\u{1F4CA}": "bar-chart", "\u{1F464}": "user", "\u{1F6E1}️": "shield", "\u{1F6E1}": "shield",
+  "❌": "x-circle", "⚖️": "scale", "⚖": "scale", "\u{1F50D}": "search",
+  "\u{1F4F7}": "camera", "\u{1F4CB}": "clipboard", "\u{1F393}": "graduation-cap",
+  "⬇️": "arrow-down", "⬇": "arrow-down", "\u{1F4CE}": "file", "\u{1F4CD}": "map-pin",
+  "\u{1F4C8}": "trending-up", "\u{1F4C5}": "calendar", "\u{1F465}": "users", "\u{1F3C6}": "trophy",
+  "⚙️": "settings", "⚙": "settings", "☰": "menu", "⬆️": "arrow-up",
+  "⬆": "arrow-up", "↳": "refresh", "\u{1F6A8}": "alert-circle", "\u{1F9BA}": "printer",
+  "\u{1F527}": "wrench", "\u{1F514}": "bell", "\u{1F4E6}": "package", "\u{1F4E5}": "inbox-download",
+  "\u{1F4D8}": "scale", "\u{1F4D7}": "clipboard", "\u{1F4D6}": "file", "\u{1F4D5}": "clipboard",
+  "\u{1F4D1}": "file", "\u{1F4BB}": "trophy", "\u{1F4AC}": "message-circle", "\u{1F3D7}️": "building",
+  "\u{1F3D7}": "building", "←": "arrow-left", "\u{1F3AF}": "target",
+};
+const EMOJI_RE = new RegExp(Object.keys(EMOJI_ICON_MAP).map(c => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "g");
+function deEmojify(root) {
+  if (!root) return;
+  const walker = document.createTreeWalker(root.nodeType === 1 ? root : root.parentNode || document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      if (!n.nodeValue) return NodeFilter.FILTER_REJECT;
+      EMOJI_RE.lastIndex = 0;
+      if (!EMOJI_RE.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+      const p = n.parentElement;
+      if (p && (p.tagName === "SCRIPT" || p.tagName === "STYLE" || p.tagName === "TITLE" || p.closest(".ico"))) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(textNode => {
+    const text = textNode.nodeValue;
+    const frag = document.createDocumentFragment();
+    let last = 0, changed = false, m;
+    EMOJI_RE.lastIndex = 0;
+    while ((m = EMOJI_RE.exec(text))) {
+      changed = true;
+      if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const name = EMOJI_ICON_MAP[m[0]];
+      const html = icon(name);
+      if (html) {
+        const wrap = document.createElement("span");
+        wrap.innerHTML = html;
+        frag.appendChild(wrap.firstChild);
+      } else {
+        frag.appendChild(document.createTextNode(m[0]));
+      }
+      last = m.index + m[0].length;
+    }
+    if (!changed) return;
+    if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+    if (textNode.parentNode) textNode.parentNode.replaceChild(frag, textNode);
+  });
+}
+let _deEmojifyScheduled = false;
+const _deEmojifyObserver = new MutationObserver(() => {
+  if (_deEmojifyScheduled) return;
+  _deEmojifyScheduled = true;
+  requestAnimationFrame(() => { _deEmojifyScheduled = false; deEmojify(document.body); });
+});
+function byId(col, id) { return DATA[col].find(r => r.id === Number(id)); }
+function indexById(col) { const m = {}; DATA[col].forEach(r => m[r.id] = r); return m; }
+function initials(name) { return (name || "?").trim()[0]?.toUpperCase() || "?"; }
+
+/* ---------------------------- filter topbar: "Proyek" & pencarian global -- */
+function projectFilterOptionNames() {
+  return [...new Set((DATA?.projects || []).map(p => p.name).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function genericRecordLocation(r) {
+  for (const k of LOCATION_FIELD_KEYS) { if (r.data && r.data[k]) return r.data[k]; }
+  return "";
+}
+function passesProjectFilter(locationValue) {
+  if (!TOPBAR_PROJECT_FILTER) return true;
+  return (locationValue || "").trim().toLowerCase() === TOPBAR_PROJECT_FILTER.trim().toLowerCase();
+}
+function passesGlobalSearch(...textParts) {
+  if (!TOPBAR_SEARCH_FILTER) return true;
+  const q = TOPBAR_SEARCH_FILTER.trim().toLowerCase();
+  return textParts.some(t => (t ?? "").toString().toLowerCase().includes(q));
+}
+function genericSearchHaystack(mod, r) {
+  const schema = MODULE_SCHEMAS[mod];
+  const parts = [String(r.id), r.title || ""];
+  if (schema) schema.fields.forEach(f => { if (["text","textarea","select"].includes(f.type)) parts.push(r.data[f.key] || ""); });
+  return parts;
+}
+function noDataMessage(defaultMsg) {
+  return (TOPBAR_PROJECT_FILTER || TOPBAR_SEARCH_FILTER) ? "Tidak ada data yang cocok dengan filter Proyek / pencarian saat ini." : defaultMsg;
+}
+function renderTopbarFilters() {
+  const sel = document.getElementById("topbarProjectFilter");
+  if (!sel) return;
+  const names = projectFilterOptionNames();
+  sel.innerHTML = `<option value="">Semua Proyek</option>` + names.map(n => `<option value="${esc(n)}" ${TOPBAR_PROJECT_FILTER===n?"selected":""}>${esc(n)}</option>`).join("");
+  const search = document.getElementById("globalSearch");
+  if (search && document.activeElement !== search) search.value = TOPBAR_SEARCH_FILTER;
+}
+
+/* ---------------------------- chart helpers (pure JS, no libs) ----------- */
+/* Palet kategorikal tervalidasi (CVD-safe, urutan tetap — lihat catatan validasi skill data-viz) */
+const PALETTE = ["#2a78d6","#eb6834","#1baf7a","#eda100","#e87ba4","#008300","#4a3aa7","#e34948"];
+function barChart(rows, valueKeys, labelKey) {
+  labelKey = labelKey || "label";
+  let maxval = 1;
+  rows.forEach(r => valueKeys.forEach(k => { maxval = Math.max(maxval, r[k] || 0); }));
+  return rows.map(r => {
+    const item = { label: r[labelKey] };
+    valueKeys.forEach(k => { const v = r[k] || 0; item[k] = v; item[k + "_pct"] = maxval ? Math.round((v / maxval) * 100) : 0; });
+    return item;
+  });
+}
+function donutChart(rows, valueKey, labelKey, palette) {
+  palette = palette || PALETTE;
+  const total = rows.reduce((s, r) => s + (r[valueKey] || 0), 0) || 1;
+  let cursor = 0; const segments = []; const legend = [];
+  rows.forEach((r, i) => {
+    const value = r[valueKey] || 0; const pct = (value / total) * 100;
+    const color = palette[i % palette.length];
+    segments.push(`${color} ${cursor.toFixed(2)}% ${(cursor + pct).toFixed(2)}%`);
+    legend.push({ label: r[labelKey], value, pct: Math.round(pct), color });
+    cursor += pct;
+  });
+  if (!rows.length) segments.push("#e1e5f2 0% 100%");
+  return { gradient: `conic-gradient(${segments.join(", ")})`, legend };
+}
+function groupCount(arr, keyFn) { const m = new Map(); arr.forEach(x => { const k = keyFn(x); m.set(k, (m.get(k) || 0) + 1); }); return m; }
+
+/* ---- futuristic SVG charts (Dashboard) ---- */
+function svgTrendChart(trend, series) {
+  if (!trend.length) return `<div class="empty-state">Belum ada data.</div>`;
+  const W = 600, H = 200, padL = 8, padR = 8, padT = 12, padB = 24;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const n = trend.length;
+  let maxVal = 1;
+  trend.forEach(t => series.forEach(s => { maxVal = Math.max(maxVal, t[s.key] || 0); }));
+  const xStep = n > 1 ? innerW / (n - 1) : 0;
+  const xOf = i => padL + (n > 1 ? i * xStep : innerW / 2);
+  const yOf = v => padT + innerH - (v / maxVal) * innerH;
+  const grid = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const y = padT + innerH - f * innerH;
+    return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>`;
+  }).join("");
+  let defs = "", marks = "";
+  series.forEach((s, si) => {
+    const pts = trend.map((t, i) => [xOf(i), yOf(t[s.key] || 0)]);
+    const line = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+    const area = `${line} L${pts[pts.length - 1][0].toFixed(1)},${(padT + innerH).toFixed(1)} L${pts[0][0].toFixed(1)},${(padT + innerH).toFixed(1)} Z`;
+    const gid = `trendFill${si}`, fid = `trendGlow${si}`;
+    defs += `<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${s.color}" stop-opacity=".45"/><stop offset="100%" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
+    defs += `<filter id="${fid}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+    marks += `<path d="${area}" fill="url(#${gid})" stroke="none"/>`;
+    marks += `<path d="${line}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#${fid})"/>`;
+    marks += pts.map((p, i) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" fill="${s.color}" stroke="#0d1a12" stroke-width="1.5"><title>${esc(s.name)} — ${esc(trend[i].label)}: ${trend[i][s.key] || 0}</title></circle>`).join("");
+  });
+  const labels = trend.map((t, i) => `<text x="${xOf(i).toFixed(1)}" y="${H - 6}" font-size="10" fill="rgba(255,255,255,.5)" text-anchor="middle">${esc(t.label)}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="trend-svg" role="img" aria-label="Grafik tren"><defs>${defs}</defs>${grid}${marks}${labels}</svg>`;
+}
+function svgGauge(score) {
+  const size = 160, stroke = 14, r = (size - stroke) / 2, c = size / 2, circ = 2 * Math.PI * r;
+  const pct = Math.max(0, Math.min(100, score)) / 100, dash = circ * pct;
+  return `<svg viewBox="0 0 ${size} ${size}" class="gauge-svg" role="img" aria-label="Skor keselamatan ${score} dari 100">
+    <defs>
+      <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#eab308"/><stop offset="100%" stop-color="#2f9e44"/></linearGradient>
+      <filter id="gaugeGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="${stroke}"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="url(#gaugeGrad)" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 ${c} ${c})" filter="url(#gaugeGlow)"/>
+  </svg>`;
+}
+
+/* ---------------------------- router -------------------------------------- */
+function currentRoute() {
+  const hash = location.hash.replace(/^#\/?/, "") || "dashboard";
+  const parts = hash.split("/");
+  return { key: parts[0], arg: parts[1] };
+}
+window.addEventListener("hashchange", () => { closeSidebarDrawer(); render(); });
+
+function navTargetHash(link) {
+  return link.module ? `#/modul/${link.key}` : `#/${link.key}`;
+}
+
+/* ---------------------------- render: shell ------------------------------- */
+function renderNav(activeKey) {
+  const html = NAV_GROUPS.map(g => `
+    ${g.label ? `<div class="nav-group-label">${esc(g.label)}</div>` : ""}
+    <div class="nav-group">
+      ${g.links.map(l => `<a class="nav-item ${activeKey === l.key ? "active" : ""}" href="${navTargetHash(l)}"><span class="nav-icon">${l.icon || (l.module && MODULE_SCHEMAS[l.key]?.icon) || "&#8226;"}</span><span>${esc(l.label)}</span></a>`).join("")}
+    </div>
+  `).join("");
+  document.getElementById("navGroups").innerHTML = html;
+}
+
+function renderUserChrome() {
+  const u = byId("users", CURRENT_USER_ID);
+  if (!u) return;
+  document.getElementById("userAvatar").textContent = initials(u.name);
+  document.getElementById("userMeta").innerHTML = `${esc(u.name)}<span>${esc(u.role)}</span>`;
+  document.getElementById("topbarAvatar").textContent = initials(u.name);
+  document.getElementById("topbarMeta").innerHTML = `${esc(u.name)}<span>${esc(u.role)}</span>`;
+}
+
+function flashHtml() {
+  if (!FLASH) return "";
+  const html = `<div class="flash flash-${FLASH.type}">${esc(FLASH.message)}</div>`;
+  FLASH = null;
+  return html;
+}
+
+function setContent(html) { document.getElementById("content").innerHTML = flashHtml() + html; }
+
+/* ---------------------------- shared "document view" modal ---------------- */
+function openView(html) { document.getElementById("viewModalBody").innerHTML = html; openModal("viewModal"); }
+
+function badgeClassFor(field, value) {
+  if (field.badgeMap) return field.badgeMap[value] || "status-open";
+  if (SEVERITY_COLORS[value]) return SEVERITY_COLORS[value];
+  if (RISK_BADGE[value]) return RISK_BADGE[value];
+  if (value === "Active") return "doc-active";
+  if (value === "Expired") return "doc-expired";
+  if (value === "Warning") return "doc-warning";
+  return `status-${slug(value || "open")}`;
+}
+
+function formatBytes(n) {
+  if (!n && n !== 0) return "-";
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+function fileIcon(type) {
+  if (!type) return "&#128196;";
+  if (type.startsWith("image/")) return "&#128247;";
+  if (type === "application/pdf") return "&#128209;";
+  if (type.includes("sheet") || type.includes("excel")) return "&#128202;";
+  if (type.includes("word") || type.includes("document")) return "&#128196;";
+  return "&#128206;";
+}
+function attachmentsBlockHtml(kind, id, attachments) {
+  attachments = attachments || [];
+  const rows = attachments.length ? attachments.map(a => `
+    <div class="attach-row">
+      <div class="attach-icon">${fileIcon(a.type)}</div>
+      <div class="attach-meta"><div class="attach-name">${esc(a.name)}</div><div class="attach-size">${formatBytes(a.size)}</div></div>
+      <a class="attach-dl" href="${a.dataUrl}" download="${esc(a.name)}" title="Unduh">&#8681;</a>
+      <button type="button" class="attach-del" data-action="delete-attachment" data-kind="${kind}" data-id="${id}" data-att="${a.id}" title="Hapus">&times;</button>
+    </div>`).join("") : `<div class="attach-empty">Belum ada berkas terlampir.</div>`;
+  return `
+    <div class="attach-block">
+      <div class="attach-header">
+        <span>&#128206; LAMPIRAN BERKAS</span>
+        <label class="attach-upload-btn">+ Unggah Berkas<input type="file" class="hidden" data-action-change="upload-attachment" data-kind="${kind}" data-id="${id}" multiple></label>
+      </div>
+      ${rows}
+      <div class="attach-hint">Berkas tersimpan langsung di data lokal ini (ikut ter-Export/Import bersama data lain). Maks 5MB per berkas.</div>
+    </div>
+  `;
+}
+function findRecordByKind(kind, id) {
+  id = Number(id);
+  if (kind === "incident") return byId("incidents", id);
+  if (kind === "team") return byId("users", id);
+  if (kind && kind.startsWith("generic:")) return byId("generic", id);
+  return null;
+}
+function reopenCurrentView() {
+  if (!CURRENT_VIEW) return;
+  const { kind, id } = CURRENT_VIEW;
+  if (kind === "incident") viewIncident(id);
+  else if (kind === "team") viewTeam(id);
+  else if (kind.startsWith("generic:")) viewGenericRecord(kind.split(":")[1], id);
+}
+function printMastheadHtml() {
+  if (!COMPANY?.name) return "";
+  return `
+    <div class="print-masthead">
+      ${COMPANY.logo ? `<img src="${COMPANY.logo}" alt="Logo">` : ""}
+      <div>
+        <div class="pm-name">${esc(COMPANY.name)}</div>
+        <div class="pm-sub">${[COMPANY.industry, COMPANY.address, COMPANY.phone].filter(Boolean).map(esc).join(" &middot; ")}</div>
+      </div>
+    </div>
+  `;
+}
+
+function viewHeadMeta(opts) {
+  return `
+    ${printMastheadHtml()}
+    <div class="view-head">
+      <div class="vh-title">
+        <div class="vh-icon">${opts.icon || "&#128196;"}</div>
+        <div><div class="vh-name">${esc(opts.title)}</div><div class="vh-sub">${COMPANY?.name ? esc(COMPANY.name) + " &middot; " : ""}CATATAN DIGITAL &middot; TERSIMPAN LOKAL</div></div>
+      </div>
+      <div class="vh-actions">
+        ${opts.extraActions || ""}
+        <button type="button" class="vh-btn dark" onclick="window.print()">&#128424; Cetak Halaman Ini</button>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="mr-item"><div class="mr-label">No. Referensi</div><div class="mr-value">${esc(opts.docId)}</div></div>
+      <div class="mr-item"><div class="mr-label">Jenis Catatan</div><div class="mr-value">${esc(opts.docType)}</div></div>
+      <div class="mr-item"><div class="mr-label">Lokasi / Area</div><div class="mr-value">${esc(opts.location || "-")}</div></div>
+      <div class="mr-item"><div class="mr-label">Tanggal / Periode</div><div class="mr-value">${esc(opts.date || "-")}</div></div>
+      <div class="mr-item"><div class="mr-label">Penanggung Jawab</div><div class="mr-value">${esc(opts.pic || "-")}</div></div>
+      <div class="mr-item"><div class="mr-label">Status Catatan</div><div class="mr-value">${esc(opts.status || "-")}</div></div>
+    </div>
+  `;
+}
+
+function docViewCard(opts) {
+  const boxesHtml = (opts.detailBoxes || []).map(b => `
+    <div class="view-detail-box ${b.full ? "full" : ""}"><div class="vd-label">${esc(b.label)}</div><div class="vd-value">${b.html ? (b.value || "-") : esc(b.value || "-")}</div></div>
+  `).join("");
+  return `
+    ${viewHeadMeta(opts)}
+    <div class="view-banner" style="background:${opts.bannerColor};color:#fff;">
+      <div class="vb-tag">${esc(opts.docType)}</div>
+      <div class="vb-title">${esc((opts.title || "").toUpperCase())}</div>
+    </div>
+    <div class="view-detail-grid">${boxesHtml}</div>
+    ${opts.kind ? attachmentsBlockHtml(opts.kind, opts.id, opts.attachments) : ""}
+  `;
+}
+
+/* ---- tampilan "Lihat" khusus HIRADC & PTW, meniru struktur kartu risiko &
+   kotak otorisasi pada web referensi (kartu skor risiko, cap verifikasi, dst) ---- */
+function hiradcViewCard(r, usersIdx) {
+  const d = r.data;
+  const docNo = `HSE/HIRADC/${String(r.id).padStart(5, "0")}`;
+  const riskLevel = d.risk_level || "-";
+  const riskClass = RISK_BADGE[riskLevel] || "risk-medium";
+  const likNum = String(d.likelihood || "-").split(" ")[0];
+  const sevNum = String(d.severity_n || "-").split(" ")[0];
+  return `
+    ${viewHeadMeta({
+      title: d.aktivitas || r.title, icon: "&#9888;", docType: "IDENTIFIKASI BAHAYA & PENILAIAN RISIKO",
+      docId: docNo, location: d.lokasi || "-", date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
+      extraActions: `<button type="button" class="vh-btn light" data-action="hiradc-view-official" data-id="${r.id}">&#128196; Lihat Dokumen Resmi</button>`,
+    })}
+    <div class="vd2-activity-row">
+      <div>
+        <div class="vd2-section-title">Identifikasi Bahaya &amp; Penilaian Risiko</div>
+        <div class="vd2-activity-title">${esc((d.aktivitas || r.title || "-").toUpperCase())}</div>
+        <div class="vd2-activity-id">ID: HRD-${r.id} &middot; <span class="badge ${HIRADC_STATUS_BADGE[r.status] || "status-inactive"}">${esc((r.status||"-").toUpperCase())}</span></div>
+      </div>
+      <div class="vd2-badge-risk ${riskClass}">${esc(riskLevel.toUpperCase())} RISK</div>
+    </div>
+    <div class="vd2-grid">
+      <div class="vd2-card">
+        <div class="vd2-label">Potensi Bahaya (Hazard)</div>
+        <div class="vd2-text">${esc(d.bahaya || "-")}</div>
+        <div class="vd2-label">Dampak / Konsekuensi</div>
+        <div class="vd2-text" style="margin-bottom:0;">${esc(d.dampak || "-")}</div>
+      </div>
+      <div class="vd2-card vd2-score-card">
+        <div class="vd2-label">Risk Matrix Analysis</div>
+        <div class="vd2-score-big">${esc(d.score ?? "-")}</div>
+        <div class="vd2-score-sub">
+          <div>LIKELIHOOD<b>${esc(likNum)}</b></div>
+          <div>SEVERITY<b>${esc(sevNum)}</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="vd2-controls-box">
+      <div class="vd2-label">Langkah Pengendalian (Controls)</div>
+      <div class="vd2-text" style="margin-bottom:0;">${esc(d.pengendalian || "-")}</div>
+    </div>
+    <div class="vd2-dark-box">
+      <div class="vd2-dark-row">
+        <div class="vd2-dark-icon">&#128100;</div>
+        <div><div class="vd2-dark-label">PIC / Pelapor</div><div class="vd2-dark-value">${esc(usersIdx[r.created_by]?.name || "-")}</div></div>
+      </div>
+      <div class="vd2-dark-row">
+        <div class="vd2-dark-icon">&#128197;</div>
+        <div><div class="vd2-dark-label">Tanggal Penilaian</div><div class="vd2-dark-value">${esc(r.record_date || "-")}</div></div>
+      </div>
+    </div>
+    ${attachmentsBlockHtml("generic:hiradc", r.id, r.attachments)}
+  `;
+}
+
+/* ---- versi "Dokumen Resmi" HIRADC — meniru formulir matriks risiko baku
+   (Peluang A-E x Akibat 1-5) seperti "Design 2" pada web referensi ---- */
+const HIRADC_PELUANG_LETTER = { 5: "A", 4: "B", 3: "C", 2: "D", 1: "E" };
+const HIRADC_RISK_TO_LETTER = { Low: "L", Medium: "M", High: "H", Extreme: "E" };
+const HIRADC_MATRIX = {
+  A: ["H", "H", "E", "E", "E"],
+  B: ["M", "H", "H", "E", "E"],
+  C: ["L", "M", "H", "E", "E"],
+  D: ["L", "L", "M", "H", "E"],
+  E: ["L", "L", "M", "H", "H"],
+};
+function hiradcOfficialViewCard(r, usersIdx) {
+  const d = r.data;
+  const docNo = `HSE/HIRADC/${String(r.id).padStart(5, "0")}`;
+  const likNum = parseInt(String(d.likelihood || "3").split(" ")[0], 10) || 3;
+  const sevNum = parseInt(String(d.severity_n || "3").split(" ")[0], 10) || 3;
+  const peluangLetter = HIRADC_PELUANG_LETTER[likNum] || "C";
+  const tingkatResiko = HIRADC_RISK_TO_LETTER[d.risk_level] || HIRADC_MATRIX[peluangLetter][sevNum - 1];
+  const matrixRows = ["A", "B", "C", "D", "E"].map(row => `
+    <tr>
+      <th>${row}</th>
+      ${HIRADC_MATRIX[row].map((v, i) => `<td class="cell-${v} ${row === peluangLetter && (i + 1) === sevNum ? "cell-active" : ""}">${v}</td>`).join("")}
+    </tr>
+  `).join("");
+  return `
+    ${viewHeadMeta({
+      title: "Dokumen Resmi HIRADC", icon: "&#128196;", docType: "FORMAT STANDAR TERCETAK",
+      docId: docNo, location: d.lokasi || "-", date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
+      extraActions: `<button type="button" class="vh-btn light" data-action="hiradc-view-modern" data-id="${r.id}">&#8592; Tampilan Modern</button>`,
+    })}
+    <div class="doc2-wrap">
+      <table class="doc2-table">
+        <tr>
+          <td class="doc2-label-cell">No. Dokumen</td><td>${esc(docNo)}</td>
+          <td class="doc2-label-cell">Revisi</td><td>00</td>
+        </tr>
+        <tr><td class="doc2-label-cell">Formulir</td><td colspan="3" class="doc2-formulir-title">TABEL IDENTIFIKASI BAHAYA DAN PENILAIAN RESIKO</td></tr>
+        <tr>
+          <td class="doc2-label-cell">Pelaksana</td><td>${esc(usersIdx[r.created_by]?.name || "-")}</td>
+          <td class="doc2-label-cell">Tanggal Penilaian</td><td>${esc(r.record_date || "-")}</td>
+        </tr>
+        <tr>
+          <td class="doc2-label-cell">Departemen</td><td>${esc(COMPANY?.industry || "HSE / OPS")}</td>
+          <td class="doc2-label-cell">Lokasi / Proyek</td><td>${esc(d.lokasi || "-")}</td>
+        </tr>
+        <tr><td class="doc2-label-cell">Nama Kegiatan</td><td colspan="3">${esc((d.aktivitas || r.title || "-").toUpperCase())}</td></tr>
+      </table>
+      <table class="doc2-table doc2-table-attached">
+        <tr>
+          <th>Potensi Bahaya dari Aktivitas/Kegiatan</th><th>Resiko</th><th colspan="2">Penilaian Resiko</th><th>Tingkat Resiko</th><th>Pengendalian Resiko</th>
+        </tr>
+        <tr class="doc2-subhead"><td></td><td></td><td>Peluang</td><td>Akibat</td><td></td><td></td></tr>
+        <tr>
+          <td>${esc(d.bahaya || "-")}</td>
+          <td><em>- ${esc(d.dampak || "-")}</em></td>
+          <td class="doc2-center"><b>${peluangLetter}</b></td>
+          <td class="doc2-center"><b>${sevNum}</b></td>
+          <td class="doc2-center"><span class="doc2-risk-pill cell-${tingkatResiko}">${tingkatResiko}</span></td>
+          <td>- ${esc(d.pengendalian || "-")}</td>
+        </tr>
+      </table>
+      <div class="doc2-matrix-wrap">
+        <table class="doc2-matrix-table">
+          <tr><th></th><th colspan="5">Akibat</th></tr>
+          <tr><th>Peluang</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+          ${matrixRows}
+        </table>
+        <div class="doc2-legend">
+          <div><b class="cell-E">E</b> Ekstreme Risk</div>
+          <div><b class="cell-H">H</b> High Risk</div>
+          <div><b class="cell-M">M</b> Moderate Risk</div>
+          <div><b class="cell-L">L</b> Low Risk</div>
+        </div>
+      </div>
+      <table class="doc2-explain-table">
+        <tr><th>Peluang</th><th>Akibat: Keselamatan Kerja</th><th>Akibat: Kesehatan Kerja</th></tr>
+        <tr>
+          <td>A : Hampir Pasti akan terjadi<br>B : Cenderung untuk dapat terjadi<br>C : Mungkin dapat terjadi<br>D : Kecil kemungkinan untuk terjadi<br>E : Sangat jarang terjadi</td>
+          <td>1 : Tdk ada cidera, kerugian material kecil<br>2 : Cedera ringan/P3K, kerugian material sedang<br>3 : Hilang hari kerja, kerugian material cukup besar<br>4 : Cacat, kerugian material besar<br>5 : Fatality, kerugian material sangat besar</td>
+          <td>1 : Tidak berpotensi menimbulkan gangguan kesehatan<br>2 : Timbul gangguan kesehatan, perlu tindakan medis &lt; 7 hr<br>3 : Timbul gangguan kesehatan, perlu tindakan medis 1-4 mgg<br>4 : Timbul gangguan kesehatan, perlu tindakan medis 1-3 bln<br>5 : Timbul gangguan kesehatan, perlu tindakan medis dlm jangka panjang</td>
+        </tr>
+      </table>
+      <table class="doc2-sign-table">
+        <tr><td>Pelaksana</td><td>Diperiksa</td><td>Disetujui</td></tr>
+        <tr>
+          <td><div class="doc2-sign-placeholder">Tanda Tangan Digital</div><div class="doc2-sign-role-label">Incharge</div></td>
+          <td><div class="doc2-sign-placeholder">Terverifikasi</div><div class="doc2-sign-role-label">Koordinator</div></td>
+          <td><div class="doc2-sign-placeholder">Disetujui</div><div class="doc2-sign-role-label">Department Head</div></td>
+        </tr>
+      </table>
+    </div>
+    ${attachmentsBlockHtml("generic:hiradc", r.id, r.attachments)}
+  `;
+}
+
+const PTW_STATUS_NOTE = {
+  "Pending Approval": { tone: "warn", icon: "&#9203;", text: "Izin ini masih berstatus <strong>Pending Approval</strong> &mdash; menunggu persetujuan HSE Officer/Supervisor." },
+  "Rejected": { tone: "reject", icon: "&#10060;", text: "Izin ini <strong>DITOLAK</strong> &mdash; permohonan perlu direvisi dan diajukan ulang." },
+  "Expired": { tone: "warn", icon: "&#9888;", text: "Izin ini sudah <strong>KEDALUWARSA</strong> &mdash; masa berlaku telah lewat, ajukan izin baru sebelum melanjutkan pekerjaan." },
+};
+function ptwViewCard(r, usersIdx) {
+  const d = r.data;
+  const isApproved = r.status === "Approved" || r.status === "Closed";
+  const note = PTW_STATUS_NOTE[r.status];
+  return `
+    ${viewHeadMeta({
+      title: r.title, icon: "&#128737;", docType: "SURAT IZIN KERJA AMAN",
+      docId: r.id, location: d.lokasi || "-", date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
+    })}
+    <div class="view-banner" style="background:#eda100;color:#fff;">
+      <div class="vb-tag">SURAT IZIN KERJA AMAN &middot; ${esc((d.jenis_pekerjaan||"-").toUpperCase())}</div>
+      <div class="vb-title">${esc((r.title || "").toUpperCase())}</div>
+    </div>
+    <div class="vd2-grid">
+      <div class="vd2-card">
+        <div class="vd2-label">Informasi Pekerjaan &amp; Lokasi</div>
+        <div class="vd2-subgrid">
+          <div><div class="vd2-label">Tipe Izin Kerja</div><div class="vd2-text">${esc(d.jenis_pekerjaan || "-")}</div></div>
+          <div><div class="vd2-label">Lokasi Spesifik</div><div class="vd2-text">${esc(d.lokasi || "-")}</div></div>
+          <div><div class="vd2-label">Berlaku Dari</div><div class="vd2-text">${esc(d.berlaku_dari || "-")}</div></div>
+          <div><div class="vd2-label">Berlaku Sampai</div><div class="vd2-text">${esc(d.berlaku_sampai || "-")}</div></div>
+        </div>
+        <div class="vd2-label">Deskripsi Pekerjaan</div>
+        <div class="vd2-text" style="margin-bottom:0;">${esc(d.deskripsi || "-")}</div>
+      </div>
+      <div>
+        <div class="vd2-controls-box" style="margin-bottom:14px;">
+          <div class="vd2-label">Kontrol Risiko / Checklist Keamanan</div>
+          <div class="vd2-text" style="margin-bottom:0;">${esc(d.pengendalian || "-")}</div>
+        </div>
+        <div class="vd2-dark-box" style="margin-bottom:0;">
+          <div class="vd2-dark-row">
+            <div class="vd2-dark-icon">&#128100;</div>
+            <div><div class="vd2-dark-label">Pemohon</div><div class="vd2-dark-value">${esc(usersIdx[d.pemohon]?.name || "-")}</div></div>
+          </div>
+          <div class="vd2-dark-row">
+            <div class="vd2-dark-icon">&#9989;</div>
+            <div><div class="vd2-dark-label">Disetujui Oleh (Authorized By)</div><div class="vd2-dark-value">${esc(usersIdx[d.disetujui_oleh]?.name || "-")}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${isApproved
+      ? `<div class="vd2-stamp-row"><div class="vd2-stamp">TERVERIFIKASI<br>&amp; DISETUJUI</div></div>`
+      : `<div class="vd2-pending-note ${note?.tone === "reject" ? "vd2-reject-note" : ""}">${note?.icon || "&#9203;"} ${note?.text || `Izin ini masih berstatus <strong>${esc(r.status)}</strong>.`}</div>`}
+    <div class="vd2-sign-row">
+      <div><div class="vd2-sign-name">${esc(usersIdx[d.pemohon]?.name || "-")}</div><div class="vd2-sign-role">Pemohon</div></div>
+      <div><div class="vd2-sign-name">${esc(usersIdx[d.disetujui_oleh]?.name || "-")}</div><div class="vd2-sign-role">Persetujuan HSE Officer</div></div>
+      <div><div class="vd2-sign-name">${esc(usersIdx[d.pic_lapangan]?.name || "-")}</div><div class="vd2-sign-role">Supervisor Lapangan</div></div>
+    </div>
+    ${attachmentsBlockHtml("generic:ptw", r.id, r.attachments)}
+  `;
+}
+
+/* ---------------------------- render: pages -------------------------------- */
+function render() {
+  if (!COMPANY) { showSetup(); return; }
+  if (!CURRENT_USER_ID) { CURRENT_USER_ID = DATA.users[0]?.id || null; }
+  showApp();
+  const { key, arg } = currentRoute();
+  if (key === "modul" && MODULE_LABELS[arg]) { renderNav(arg); renderModule(arg); return; }
+  renderNav(key);
+  switch (key) {
+    case "dashboard": renderDashboard(); break;
+    case "performa": renderPerforma(); break;
+    case "statistik": renderStatistik(); break;
+    case "insiden": renderIncidents(PENDING_FILTER); PENDING_FILTER = null; break;
+    case "tim": renderTeam(); break;
+    case "pengaturan": renderSettings(); break;
+    default: renderDashboard();
+  }
+}
+
+function renderDashboard() {
+  const projectsIdx = indexById("projects");
+  const incidents = TOPBAR_PROJECT_FILTER
+    ? DATA.incidents.filter(i => (projectsIdx[i.project_id]?.name || "").toLowerCase() === TOPBAR_PROJECT_FILTER.toLowerCase())
+    : DATA.incidents;
+  const total = incidents.length;
+  const closed = incidents.filter(i => i.status === "Closed").length;
+  const openIssues = total - closed;
+  const criticalOpen = incidents.filter(i => i.status !== "Closed" && ["Critical","High"].includes(i.severity)).length;
+  const compliance = total ? Math.round((closed / total) * 100) : 0;
+  const inspeksiCount = DATA.generic.filter(r => r.module === "inspeksi" && passesProjectFilter(genericRecordLocation(r))).length;
+  const safetyScore = Math.max(5, Math.min(100, Math.round(compliance * 0.6 + 40 - criticalOpen * 3)));
+
+  const byMonth = new Map();
+  incidents.forEach(i => {
+    const d = parseDT(i.occurred_at); if (!d) return;
+    const key = MONTH_ABBR[d.getMonth() + 1];
+    if (!byMonth.has(key)) byMonth.set(key, { near_miss: 0, insiden: 0, m: d.getMonth() + 1 });
+    const rec = byMonth.get(key);
+    if (i.category === "Near Miss") rec.near_miss++; else rec.insiden++;
+  });
+  const trend = [...byMonth.entries()].sort((a,b)=>a[1].m-b[1].m).map(([label, v]) => ({ label, ...v }));
+  const trendSeries = [{ key: "near_miss", color: "#2a78d6", name: "Near Miss" }, { key: "insiden", color: "#e34948", name: "Insiden" }];
+
+  const catCounts = groupCount(incidents, i => i.category);
+  const byCategory = [...catCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([category,c])=>({category,c}));
+  const { gradient, legend } = donutChart(byCategory, "c", "category");
+  const topCategory = byCategory[0]?.category || "-";
+
+  const recent = [...incidents].sort((a,b)=> (b.created_at||"").localeCompare(a.created_at||"")).slice(0,6);
+
+  setContent(`
+    <div class="stat-grid">
+      <div class="stat-card stat-blue clickable" data-action="goto-hash" data-hash="#/modul/inspeksi" title="Lihat modul Inspeksi"><div class="stat-icon">&#128203;</div><div class="stat-label">TOTAL INSPEKSI</div><div class="stat-value">${inspeksiCount}</div><div class="stat-sub">Terhitung dari seluruh data tersimpan</div></div>
+      <div class="stat-card stat-green clickable" data-action="goto-hash" data-hash="#/performa" title="Lihat Performa HSE"><div class="stat-icon">&#128737;</div><div class="stat-label">TINGKAT KEPATUHAN</div><div class="stat-value">${compliance}%</div><div class="stat-sub">Rasio insiden selesai terhadap total</div></div>
+      <div class="stat-card stat-orange clickable" data-action="goto-hash" data-hash="#/insiden" title="Lihat semua insiden"><div class="stat-icon">&#9888;</div><div class="stat-label">TEMUAN TERBUKA</div><div class="stat-value">${openIssues}</div><div class="stat-sub">Masih menunggu tindak lanjut</div></div>
+      <div class="stat-card stat-red clickable" data-action="goto-hash" data-hash="#/insiden" title="Lihat semua insiden"><div class="stat-icon">&#128200;</div><div class="stat-label">KRITIKAL AKTIF</div><div class="stat-value">${criticalOpen}</div><div class="stat-sub">Butuh perhatian segera</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel chart-glass clickable" data-action="goto-hash" data-hash="#/insiden" title="Klik untuk lihat detail insiden">
+        <div class="panel-title">TREN INSIDEN &amp; NEAR MISS</div>
+        <div class="panel-subtitle">Dihitung otomatis dari tanggal kejadian tercatat &middot; klik untuk detail</div>
+        ${svgTrendChart(trend, trendSeries)}
+        <div class="legend-row"><span class="legend-item"><span class="legend-dot" style="background:#2a78d6;"></span>Near Miss</span><span class="legend-item"><span class="legend-dot" style="background:#e34948;"></span>Insiden</span></div>
+      </div>
+      <div>
+        <div class="safety-score-card chart-glass clickable" data-action="goto-hash" data-hash="#/performa" title="Lihat Performa HSE">
+          <div class="label">SKOR KESELAMATAN (DINAMIS)</div>
+          <div class="gauge-wrap">
+            ${svgGauge(safetyScore)}
+            <div class="gauge-center"><div class="gauge-value">${safetyScore}</div><div class="gauge-max">/ 100</div></div>
+          </div>
+        </div>
+        <div class="info-panel">
+          <div class="info-title">&#128202; RINGKASAN OTOMATIS</div>
+          <p>Kategori temuan terbanyak saat ini adalah <strong>"${esc(topCategory)}"</strong> (${byCategory[0]?.c || 0} catatan). Ada <strong>${criticalOpen}</strong> insiden kritikal yang masih berstatus terbuka dan perlu tindak lanjut segera.</p>
+          <button class="info-btn" type="button" data-action="goto-hash" data-hash="#/insiden">&#128269; Lihat Semua Insiden</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">INSIDEN TERBARU</div>
+        <div class="panel-subtitle">6 laporan yang baru masuk &middot; klik baris untuk detail</div>
+        <div class="table-scroll"><table class="data-table"><thead><tr><th>Nama</th><th>Proyek</th><th>Severity</th><th>Status</th></tr></thead><tbody>
+          ${recent.length ? recent.map(r => `<tr class="row-clickable" data-action="view-incident" data-id="${r.id}"><td class="cell-title">${esc(r.name)}</td><td>${esc(projectsIdx[r.project_id]?.name || "-")}</td><td><span class="badge ${SEVERITY_COLORS[r.severity]}">${esc(r.severity)}</span></td><td><span class="badge status-${slug(r.status)}">${esc(r.status)}</span></td></tr>`).join("") : `<tr><td colspan="4" class="empty-state">Belum ada data insiden.</td></tr>`}
+        </tbody></table></div>
+      </div>
+      <div class="panel chart-glass">
+        <div class="panel-title">SEBARAN KATEGORI TEMUAN</div>
+        <div class="panel-subtitle">Dihitung dari keseluruhan riwayat insiden &middot; klik kategori untuk filter</div>
+        <div class="donut-wrap">
+          <div class="donut donut-dark clickable" data-action="goto-hash" data-hash="#/insiden" title="Lihat semua insiden">
+            <div class="donut-center-label"><div class="dcl-value">${total}</div><div class="dcl-label">TOTAL</div></div>
+          </div>
+          <div class="donut-legend">${legend.map(l => `<div class="legend-item clickable" data-action="goto-filter" data-filter="${esc(l.label)}" title="Filter insiden kategori ${esc(l.label)}"><span class="legend-dot" style="background:${l.color}"></span>${esc(l.label)}<strong>${l.pct}%</strong></div>`).join("")}</div>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function renderPerforma() {
+  const incidents = DATA.incidents;
+  const countsByProject = groupCount(incidents, i => i.project_id);
+  const byProjectRaw = DATA.projects.map(p => ({ label: p.name, c: countsByProject.get(p.id) || 0 }))
+    .sort((a,b)=>b.c-a.c).slice(0,10);
+  const byProject = barChart(byProjectRaw, ["c"]);
+
+  const statusCounts = groupCount(incidents, i => i.status);
+  const byStatus = [...statusCounts.entries()].map(([status,c])=>({status,c}));
+  const { gradient, legend } = donutChart(byStatus, "c", "status");
+
+  const moduleCounts = groupCount(DATA.generic, r => r.module);
+  const moduleRows = [...moduleCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([m,c])=>({module:m,c,label:MODULE_LABELS[m]||m}));
+
+  setContent(`
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">INSIDEN PER LOKASI/PROYEK</div>
+        <div class="panel-subtitle">10 area dengan catatan temuan paling banyak</div>
+        ${byProject.length ? byProject.map(p => `
+          <div class="hbar-row"><div class="hbar-label">${esc(p.label)}</div><div class="hbar-track"><div class="hbar-fill" style="width:${p.c_pct}%"></div></div><div class="hbar-value">${p.c}</div></div>
+        `).join("") : `<div class="empty-state">Belum ada data.</div>`}
+      </div>
+      <div class="panel">
+        <div class="panel-title">STATUS PENANGANAN</div>
+        <div class="panel-subtitle">Sebaran status dari semua insiden tercatat</div>
+        <div class="donut-wrap">
+          <div class="donut" style="background:${gradient}"></div>
+          <div class="donut-legend">${legend.map(l => `<div class="legend-item"><span class="legend-dot" style="background:${l.color}"></span>${esc(l.label)}<strong>${l.pct}%</strong></div>`).join("")}</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">AKTIVITAS PER MODUL</div>
+      <div class="panel-subtitle">Banyaknya catatan di setiap modul operasional K3</div>
+      <div class="table-scroll"><table class="data-table"><thead><tr><th>Modul</th><th>Jumlah Data</th></tr></thead><tbody>
+        ${moduleRows.map(m => `<tr><td class="cell-title">${esc(m.label)}</td><td>${m.c}</td></tr>`).join("")}
+      </tbody></table></div>
+    </div>
+  `);
+}
+
+function renderStatistik() {
+  const incidents = DATA.incidents;
+  const sevCounts = groupCount(incidents, i => i.severity);
+  const bySeverity = ["Low","Medium","High","Critical"].map(s => ({ severity: s, c: sevCounts.get(s) || 0 }));
+
+  const byMonth = new Map();
+  incidents.forEach(i => {
+    const d = parseDT(i.occurred_at); if (!d) return;
+    const key = `${d.getFullYear()}-${MONTH_ABBR[d.getMonth()+1]}`;
+    const m = d.getFullYear()*100 + d.getMonth() + 1;
+    if (!byMonth.has(key)) byMonth.set(key, { c: 0, m });
+    byMonth.get(key).c++;
+  });
+  const monthlyRaw = [...byMonth.entries()].sort((a,b)=>a[1].m-b[1].m).map(([label,v])=>({label,c:v.c}));
+  const monthly = barChart(monthlyRaw, ["c"]);
+
+  const now = new Date();
+  const durations = incidents.filter(i => i.status === "Closed").map(i => { const d = parseDT(i.occurred_at); return d ? Math.round((now - d)/86400000) : null; }).filter(x => x !== null);
+  const avgResolution = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
+
+  setContent(`
+    <div class="kpi-grid">
+      ${bySeverity.map(s => `<div class="kpi-tile"><div class="kpi-label">${esc(s.severity)}</div><div class="kpi-value"><span class="badge ${SEVERITY_COLORS[s.severity]}">${s.c}</span></div></div>`).join("")}
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">TREN INSIDEN BULANAN</div>
+        <div class="panel-subtitle">Perbandingan jumlah insiden tiap bulan</div>
+        <div class="bars">
+          ${monthly.length ? monthly.map(m => `<div class="bar-col"><div class="bar-stack" style="height:${Math.max(m.c_pct,6)}%"><div class="bar-seg" style="height:100%; background:#3b5bdb;" title="${m.c}"></div></div><div class="bar-label">${esc(m.label)}</div></div>`).join("") : `<div class="empty-state">Belum ada data.</div>`}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">RATA-RATA WAKTU PENYELESAIAN</div>
+        <div class="panel-subtitle">Dihitung dari insiden yang berstatus Closed</div>
+        <div class="stat-card stat-blue" style="margin-top:6px;"><div class="stat-label">WAKTU PENYELESAIAN RATA-RATA</div><div class="stat-value">${avgResolution} hari</div><div class="stat-sub">Rentang dari tanggal kejadian sampai sekarang</div></div>
+      </div>
+    </div>
+  `);
+}
+
+function renderIncidents(search) {
+  search = (search ?? document.getElementById("incidentSearch")?.value ?? "").trim().toLowerCase();
+  const projectsIdx = indexById("projects");
+  let rows = [...DATA.incidents];
+  if (search) rows = rows.filter(r => r.name.toLowerCase().includes(search) || (projectsIdx[r.project_id]?.name || "").toLowerCase().includes(search) || r.category.toLowerCase().includes(search) || r.severity.toLowerCase().includes(search));
+  rows = rows.filter(r => passesProjectFilter(projectsIdx[r.project_id]?.name) && passesGlobalSearch(String(r.id), r.name, projectsIdx[r.project_id]?.name, r.category, r.severity));
+  rows.sort((a,b) => (b.occurred_at||"").localeCompare(a.occurred_at||""));
+
+  const projects = [...DATA.projects].sort((a,b)=>a.name.localeCompare(b.name));
+  const users = [...DATA.users].sort((a,b)=>a.name.localeCompare(b.name));
+
+  setContent(`
+    <div class="panel">
+      <div class="table-toolbar">
+        <div><div class="panel-title">CATATAN INSIDEN K3</div><div class="panel-subtitle">${rows.length} laporan tersimpan</div></div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <input class="search-input" id="incidentSearch" value="${esc(search)}" placeholder="Cari nama insiden atau proyek..." style="min-width:160px; flex:1;">
+          <button class="btn btn-primary" id="openIncidentModal">+ Lapor Insiden</button>
+        </div>
+      </div>
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>Informasi Kejadian &amp; Tipe</th><th>Lokasi/Proyek</th><th>Waktu &amp; Tanggal</th><th>Severity</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(r => `
+            <tr>
+              <td><div class="cell-title">${esc(r.name)}</div><div class="cell-sub">${esc(r.category)}</div></td>
+              <td>${esc(projectsIdx[r.project_id]?.name || "-")}</td>
+              <td>${esc(fmtDateTime(r.occurred_at))}</td>
+              <td><span class="badge ${SEVERITY_COLORS[r.severity]}">${esc((r.severity||"").toUpperCase())}</span></td>
+              <td><span class="badge status-${slug(r.status)}">${esc((r.status||"").toUpperCase())}</span></td>
+              <td>
+                <button class="icon-btn view" data-action="view-incident" data-id="${r.id}" title="Lihat">&#128065;</button>
+                <button class="icon-btn edit" data-action="edit-incident" data-id="${r.id}" title="Edit">&#9998;</button>
+                <button class="icon-btn del" data-action="delete-incident" data-id="${r.id}" title="Hapus">&#128465;</button>
+              </td>
+            </tr>`).join("") : `<tr><td colspan="6" class="empty-state">${noDataMessage('Belum ada insiden tercatat. Klik "Lapor Insiden" untuk menambahkan.')}</td></tr>`}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="modal-overlay" id="incidentModal">
+      <div class="modal-box">
+        <button class="modal-close" data-action="close-modal" data-target="incidentModal">&times;</button>
+        <h2 id="incidentModalTitle">Daftar Insiden</h2>
+        <form id="incidentForm">
+          <div class="form-group"><label>Nama Insiden</label><input class="text-input" name="name" placeholder="Contoh: Tergelincir di Area Scaffolding" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Kategori Kejadian</label><select class="select-input" name="category"><option>Near Miss</option><option>Kecelakaan Kerja</option><option>Kerusakan Alat</option><option>Kondisi Tidak Aman</option></select></div>
+            <div class="form-group"><label>Tingkat Keparahan</label><select class="select-input" name="severity"><option value="Low">Low / Rendah</option><option value="Medium">Medium / Sedang</option><option value="High">High / Tinggi</option><option value="Critical">Critical</option></select></div>
+          </div>
+          <div class="form-group"><label>Deskripsi Kejadian</label><textarea class="text-input" name="description" rows="3" placeholder="Ceritakan kronologi kejadian secara detail..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Proyek Terkait</label><select class="select-input" name="project_id"><option value="">Pilih proyek...</option>${projects.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div>
+            <div class="form-group"><label>Status Investigasi</label><select class="select-input" name="status"><option value="Open">Open (Laporan Baru)</option><option value="In Progress">In Progress</option><option value="Closed">Closed</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Waktu Kejadian</label><input class="text-input" type="datetime-local" name="occurred_at" value="${nowLocalInput()}"></div>
+            <div class="form-group"><label>Petugas Investigasi (PIC)</label><select class="select-input" name="pic_id"><option value="">Pilih PIC...</option>${users.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join("")}</select></div>
+          </div>
+          <div class="form-group"><label>Analisis Akar Penyebab</label><textarea class="text-input" name="root_cause" rows="2" placeholder="Apa penyebab utama kejadian ini?"></textarea></div>
+          <div class="form-group"><label>Tindakan Perbaikan Segera</label><textarea class="text-input" name="corrective_action" rows="2" placeholder="Tindakan perbaikan segera yang telah/akan dilakukan..."></textarea></div>
+          <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center; margin-top:8px;">Submit</button>
+        </form>
+      </div>
+    </div>
+  `);
+
+  document.getElementById("openIncidentModal").addEventListener("click", () => openIncidentForm(null));
+  document.getElementById("incidentSearch").addEventListener("input", debounce(() => renderIncidents(document.getElementById("incidentSearch").value), 250));
+  document.getElementById("incidentForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    const f = new FormData(form);
+    const isEdit = form.dataset.mode === "edit";
+    const payload = {
+      name: f.get("name"), category: f.get("category"), severity: f.get("severity"),
+      description: f.get("description"), project_id: f.get("project_id") ? Number(f.get("project_id")) : null,
+      status: f.get("status"), occurred_at: f.get("occurred_at") || isoDateTime(new Date()),
+      pic_id: f.get("pic_id") ? Number(f.get("pic_id")) : null, root_cause: f.get("root_cause"),
+      corrective_action: f.get("corrective_action"),
+    };
+    if (isEdit) {
+      const r = byId("incidents", Number(form.dataset.id));
+      Object.assign(r, payload);
+      FLASH = { type: "success", message: "Insiden berhasil diperbarui." };
+    } else {
+      DATA.incidents.push({ id: nextId("incidents"), ...payload, created_by: CURRENT_USER_ID, created_at: isoDateTime(new Date()) });
+      FLASH = { type: "success", message: "Insiden berhasil dilaporkan." };
+    }
+    closeModal("incidentModal");
+    renderIncidents("");
+  });
+}
+
+function openIncidentForm(id) {
+  if (!id && demoBlockAdd()) return;
+  const r = id ? byId("incidents", id) : null;
+  document.getElementById("incidentModalTitle").textContent = r ? "Edit Insiden" : "Daftar Insiden";
+  const form = document.getElementById("incidentForm");
+  form.dataset.mode = r ? "edit" : "create";
+  if (r) form.dataset.id = r.id; else delete form.dataset.id;
+  form.name.value = r?.name || "";
+  form.category.value = r?.category || "Near Miss";
+  form.severity.value = r?.severity || "Low";
+  form.description.value = r?.description || "";
+  form.project_id.value = r?.project_id || "";
+  form.status.value = r?.status || "Open";
+  form.occurred_at.value = r?.occurred_at ? r.occurred_at.slice(0,16) : nowLocalInput();
+  form.pic_id.value = r?.pic_id || "";
+  form.root_cause.value = r?.root_cause || "";
+  form.corrective_action.value = r?.corrective_action || "";
+  openModal("incidentModal");
+}
+
+function viewIncident(id) {
+  const r = byId("incidents", id);
+  if (!r) return;
+  CURRENT_VIEW = { kind: "incident", id };
+  const projectsIdx = indexById("projects");
+  const usersIdx = indexById("users");
+  openView(docViewCard({
+    title: r.name, icon: "&#9888;", docType: "CATATAN INVESTIGASI INSIDEN", docId: r.id,
+    location: projectsIdx[r.project_id]?.name || "-", date: fmtDateTime(r.occurred_at),
+    pic: usersIdx[r.pic_id]?.name || "-", status: r.status, bannerColor: "#e34948",
+    kind: "incident", id: r.id, attachments: r.attachments,
+    detailBoxes: [
+      { label: "Jenis Insiden", value: r.category },
+      { label: "Tingkat Keparahan", value: `<span class="badge ${SEVERITY_COLORS[r.severity]}">${esc(r.severity)}</span>`, html: true },
+      { label: "Ringkasan Kronologi", value: r.description, full: true },
+      { label: "Analisis Akar Penyebab", value: r.root_cause, full: true },
+      { label: "Tindakan Perbaikan Segera", value: r.corrective_action, full: true },
+      { label: "Status Investigasi", value: `<span class="badge status-${slug(r.status)}">${esc(r.status)}</span>`, html: true },
+      { label: "Pelapor", value: usersIdx[r.created_by]?.name || "-" },
+    ],
+  }));
+}
+
+function renderTeam() {
+  const inspeksiByUser = groupCount(DATA.generic.filter(r=>r.module==="inspeksi"), r=>r.created_by);
+  const capaSolvedByUser = groupCount(DATA.generic.filter(r=>r.module==="capa" && r.status==="Closed"), r=>r.created_by);
+  const members = [...DATA.users].map(u => ({ ...u, inspections: inspeksiByUser.get(u.id)||0, capa_solved: capaSolvedByUser.get(u.id)||0 }))
+    .sort((a,b)=>(b.points||0)-(a.points||0));
+  const leaders = members.slice(0,3);
+
+  setContent(`
+    <div class="leaderboard">
+      ${leaders.map(m => `
+        <div class="leader-card">
+          <div class="role">${esc(m.role)}</div>
+          <div class="name">${esc(m.name)}</div>
+          <span class="pts">&#127942; ${m.points||0} PTS</span>
+          <div class="leader-stats"><div><span>Inspections</span><strong>${m.inspections}</strong></div><div><span>CAPA Solved</span><strong>${m.capa_solved}</strong></div></div>
+        </div>`).join("")}
+    </div>
+    <div class="panel">
+      <div class="table-toolbar">
+        <div><div class="panel-title">MANAJEMEN TIM</div><div class="panel-subtitle">Atur peran, kontak, dan hak akses tiap personel K3 di sini</div></div>
+        <button class="btn btn-primary" id="openTeamModal">+ Tambah Anggota</button>
+      </div>
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>Nama &amp; Kontak</th><th>Peran</th><th>Kompetensi (Expiry)</th><th>Status</th><th>Tindakan</th></tr></thead>
+        <tbody>
+          ${members.map(m => `
+            <tr>
+              <td><div class="cell-title">${esc(m.name)}</div><div class="cell-sub" style="text-transform:none;">${esc(m.email)}${m.phone?` &middot; WA: ${esc(m.phone)}`:""}</div></td>
+              <td>${esc(m.role)}</td>
+              <td>${esc(m.masa_berlaku_sertifikat || "Belum ada data")}</td>
+              <td><span class="badge status-closed">${esc(m.status)}</span></td>
+              <td>
+                <button class="icon-btn view" data-action="view-team" data-id="${m.id}" title="Lihat">&#128065;</button>
+                <button class="icon-btn edit" data-action="edit-team" data-id="${m.id}" title="Edit">&#9998;</button>
+                <button class="icon-btn del" data-action="delete-team" data-id="${m.id}" title="Hapus">&#128465;</button>
+              </td>
+            </tr>`).join("")}
+        </tbody>
+      </table></div>
+    </div>
+    <div class="modal-overlay" id="teamModal">
+      <div class="modal-box">
+        <button class="modal-close" data-action="close-modal" data-target="teamModal">&times;</button>
+        <h2 id="teamModalTitle">Tambah Anggota Tim</h2>
+        <form id="teamForm">
+          <div class="form-group"><label>Nama Lengkap</label><input class="text-input" name="name" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Email</label><input class="text-input" type="email" name="email" required></div>
+            <div class="form-group"><label>No. WhatsApp</label><input class="text-input" name="phone"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Peran / Jabatan</label><select class="select-input" name="role"><option>HSE Manager</option><option>HSE Supervisor</option><option>Safety Officer</option><option>Admin HSE</option></select></div>
+            <div class="form-group"><label>Kontak Darurat (Nama - No. Telp)</label><input class="text-input" name="kontak_darurat" placeholder="Contoh: Istri - 081234..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Golongan Darah</label><select class="select-input" name="gol_darah"><option value="">Pilih...</option><option>A</option><option>B</option><option>AB</option><option>O</option></select></div>
+            <div class="form-group"><label>Catatan Medis / Alergi</label><input class="text-input" name="catatan_medis" placeholder="Misal: Alergi Seafood, Asma..."></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Sertifikat Utama</label><input class="text-input" name="sertifikat_utama" placeholder="Misal: Ahli K3 Umum"></div>
+            <div class="form-group"><label>Masa Berlaku Sertifikat</label><input class="text-input" type="date" name="masa_berlaku_sertifikat"></div>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center;">Simpan</button>
+        </form>
+      </div>
+    </div>
+  `);
+
+  document.getElementById("openTeamModal").addEventListener("click", () => openTeamForm(null));
+  document.getElementById("teamForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    const f = new FormData(form);
+    const isEdit = form.dataset.mode === "edit";
+    const payload = {
+      name: f.get("name"), email: f.get("email"), phone: f.get("phone"), role: f.get("role"),
+      kontak_darurat: f.get("kontak_darurat"), gol_darah: f.get("gol_darah"), catatan_medis: f.get("catatan_medis"),
+      sertifikat_utama: f.get("sertifikat_utama"), masa_berlaku_sertifikat: f.get("masa_berlaku_sertifikat") || null,
+    };
+    if (isEdit) {
+      const r = byId("users", Number(form.dataset.id));
+      Object.assign(r, payload);
+      FLASH = { type: "success", message: "Anggota tim diperbarui." };
+    } else {
+      DATA.users.push({ id: nextId("users"), ...payload, status: "Active", competency_expiry: null, points: 0 });
+      FLASH = { type: "success", message: "Anggota tim ditambahkan." };
+    }
+    closeModal("teamModal");
+    renderTeam();
+  });
+}
+
+function openTeamForm(id) {
+  if (!id && demoBlockAdd()) return;
+  const r = id ? byId("users", id) : null;
+  document.getElementById("teamModalTitle").textContent = r ? "Edit Anggota Tim" : "Tambah Anggota Tim";
+  const form = document.getElementById("teamForm");
+  form.dataset.mode = r ? "edit" : "create";
+  if (r) form.dataset.id = r.id; else delete form.dataset.id;
+  form.name.value = r?.name || "";
+  form.email.value = r?.email || "";
+  form.phone.value = r?.phone || "";
+  form.role.value = r?.role || "HSE Manager";
+  form.kontak_darurat.value = r?.kontak_darurat || "";
+  form.gol_darah.value = r?.gol_darah || "";
+  form.catatan_medis.value = r?.catatan_medis || "";
+  form.sertifikat_utama.value = r?.sertifikat_utama || "";
+  form.masa_berlaku_sertifikat.value = r?.masa_berlaku_sertifikat || "";
+  openModal("teamModal");
+}
+
+function viewTeam(id) {
+  const r = byId("users", id);
+  if (!r) return;
+  CURRENT_VIEW = { kind: "team", id };
+  openView(docViewCard({
+    title: r.name, icon: "&#128100;", docType: "PROFIL ANGGOTA TIM K3", docId: r.id, location: "-",
+    date: r.masa_berlaku_sertifikat || "-", pic: r.role, status: r.status, bannerColor: "#1c3524",
+    kind: "team", id: r.id, attachments: r.attachments,
+    detailBoxes: [
+      { label: "Email", value: r.email },
+      { label: "No. WhatsApp", value: r.phone },
+      { label: "Peran / Jabatan", value: r.role },
+      { label: "Kontak Darurat", value: r.kontak_darurat },
+      { label: "Golongan Darah", value: r.gol_darah },
+      { label: "Catatan Medis / Alergi", value: r.catatan_medis },
+      { label: "Sertifikat Utama", value: r.sertifikat_utama },
+      { label: "Masa Berlaku Sertifikat", value: r.masa_berlaku_sertifikat },
+    ],
+  }));
+}
+
+/* ---------------------------- module dispatcher ---------------------------
+   Setiap modul operasional punya tampilan sendiri: CAPA (kartu + Rubah
+   Status), Kalender Keselamatan (kalender bulan penuh), Pusat Dokumen
+   (daftar dokumen + statistik), dan 10 modul lain memakai tabel generik
+   yang bentuknya digerakkan oleh MODULE_SCHEMAS (field & label bespoke). */
+function renderModule(mod) {
+  if (mod === "capa") return renderCapaModule();
+  if (mod === "kalender") return renderKalenderModule();
+  if (mod === "dokumen") return renderDokumenModule();
+  return renderGenericModule(mod);
+}
+
+/* ---- shared Add/Edit modal shell + field renderers (dipakai semua modul) ---- */
+function genericModalShell() {
+  return `
+    <div class="modal-overlay" id="moduleModal">
+      <div class="modal-box">
+        <button class="modal-close" data-action="close-modal" data-target="moduleModal">&times;</button>
+        <h2 id="moduleModalTitle">Tambah Data</h2>
+        <form id="moduleForm">
+          <div id="moduleFormFields"></div>
+          <button class="btn btn-primary" type="submit" style="width:100%; justify-content:center; margin-top:6px;">Simpan</button>
+        </form>
+      </div>
+    </div>`;
+}
+
+function renderFieldInput(f, value) {
+  value = value ?? "";
+  const req = f.required ? "required" : "";
+  if (f.type === "textarea") return `<div class="form-group"><label>${esc(f.label)}</label><textarea class="text-input" name="${f.key}" rows="3" placeholder="${esc(f.ph||"")}" ${req}>${esc(value)}</textarea></div>`;
+  if (f.type === "select") return `<div class="form-group"><label>${esc(f.label)}</label><select class="select-input" name="${f.key}" ${req}>${f.options.map(o=>`<option value="${esc(o)}" ${value===o?"selected":""}>${esc(o)}</option>`).join("")}</select></div>`;
+  if (f.type === "user") { const users=[...DATA.users].sort((a,b)=>a.name.localeCompare(b.name)); return `<div class="form-group"><label>${esc(f.label)}</label><select class="select-input" name="${f.key}"><option value="">Pilih...</option>${users.map(u=>`<option value="${u.id}" ${String(value)===String(u.id)?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>`; }
+  if (f.type === "date") return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="date" name="${f.key}" value="${esc(value)}" ${req}></div>`;
+  if (f.type === "number") return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="number" name="${f.key}" value="${esc(value)}" placeholder="${esc(f.ph||"")}"></div>`;
+  return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="text" name="${f.key}" value="${esc(value)}" placeholder="${esc(f.ph||"")}" ${req}></div>`;
+}
+function renderFormFields(schema, record) {
+  const data = record ? record.data : {};
+  return schema.fields.map(f => renderFieldInput(f, data[f.key])).join("");
+}
+
+function openGenericAdd(mod) {
+  if (demoBlockAdd()) return;
+  const schema = MODULE_SCHEMAS[mod];
+  document.getElementById("moduleModalTitle").textContent = "Tambah Data — " + schema.label;
+  document.getElementById("moduleFormFields").innerHTML = renderFormFields(schema, null);
+  const form = document.getElementById("moduleForm");
+  form.dataset.mode = "create"; form.dataset.module = mod; delete form.dataset.id;
+  openModal("moduleModal");
+}
+function openGenericEdit(mod, id) {
+  const schema = MODULE_SCHEMAS[mod];
+  const record = byId("generic", id);
+  document.getElementById("moduleModalTitle").textContent = "Edit Data — " + schema.label;
+  document.getElementById("moduleFormFields").innerHTML = renderFormFields(schema, record);
+  const form = document.getElementById("moduleForm");
+  form.dataset.mode = "edit"; form.dataset.module = mod; form.dataset.id = id;
+  openModal("moduleModal");
+}
+
+function buildGenericRecord(mod, formData, existing) {
+  const schema = MODULE_SCHEMAS[mod];
+  const data = {};
+  schema.fields.forEach(f => { data[f.key] = formData.get(f.key) || ""; });
+  if (mod === "hiradc") {
+    const l = parseInt(data.likelihood, 10) || 0, s = parseInt(data.severity_n, 10) || 0;
+    const score = l * s;
+    data.score = score;
+    data.risk_level = score > 15 ? "Extreme" : score >= 8 ? "High" : score >= 4 ? "Medium" : "Low";
+  }
+  const titleField = schema.fields.find(f => f.title);
+  const dateField = schema.fields.find(f => f.type === "date");
+  const statusField = schema.fields.find(f => f.key === "status");
+  const rec = existing || { id: nextId("generic"), module: mod, created_by: CURRENT_USER_ID, created_at: isoDateTime(new Date()) };
+  rec.title = titleField ? data[titleField.key] : `${schema.label} #${rec.id}`;
+  rec.status = statusField ? (data.status || "Open") : "Open";
+  rec.record_date = dateField ? (data[dateField.key] || isoDate(new Date())) : isoDate(new Date());
+  rec.data = data;
+  return rec;
+}
+
+function genericFormSubmitHandler(e) {
+  e.preventDefault();
+  const form = e.target;
+  const modKey = form.dataset.module;
+  const schema = MODULE_SCHEMAS[modKey];
+  const f = new FormData(form);
+  const isEdit = form.dataset.mode === "edit";
+  const existing = isEdit ? byId("generic", Number(form.dataset.id)) : null;
+  const rec = buildGenericRecord(modKey, f, existing);
+  if (!isEdit) DATA.generic.push(rec);
+  closeModal("moduleModal");
+  FLASH = { type: "success", message: isEdit ? `Data ${schema.label} diperbarui.` : `Data ${schema.label} ditambahkan.` };
+  renderModule(modKey);
+}
+
+function viewGenericRecord(mod, id) {
+  const schema = MODULE_SCHEMAS[mod];
+  const r = byId("generic", id);
+  if (!r) return;
+  CURRENT_VIEW = { kind: "generic:" + mod, id };
+  const usersIdx = indexById("users");
+  if (mod === "hiradc") { openView(hiradcViewCard(r, usersIdx)); return; }
+  if (mod === "ptw") { openView(ptwViewCard(r, usersIdx)); return; }
+  const titleField = schema.fields.find(f => f.title);
+  const title = (titleField && r.data[titleField.key]) || r.title || "(tanpa judul)";
+  const boxes = schema.fields.filter(f => f !== titleField).map(f => {
+    let val = r.data[f.key];
+    if (f.type === "user") val = usersIdx[val]?.name || "-";
+    if (f.badge) return { label: f.label, value: `<span class="badge ${badgeClassFor(f, r.data[f.key])}">${esc((val||"").toString().toUpperCase())}</span>`, html: true };
+    return { label: f.label, value: val, full: f.type === "textarea" };
+  });
+  const locVal = genericRecordLocation(r) || "-";
+  openView(docViewCard({
+    title, icon: schema.icon, docType: schema.docType, docId: r.id, location: locVal,
+    date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
+    bannerColor: schema.bannerColor, detailBoxes: boxes,
+    kind: "generic:" + mod, id: r.id, attachments: r.attachments,
+  }));
+}
+
+/* ---- default table-driven renderer, dipakai 10 dari 13 modul operasional ---- */
+function renderGenericRow(mod, r, titleField, subField, colFields, usersIdx) {
+  const titleVal = (titleField && r.data[titleField.key]) || r.title || "(tanpa judul)";
+  const subVal = subField ? r.data[subField.key] : null;
+  return `<tr>
+    <td><div class="cell-title">${esc(titleVal)}</div>${subVal?`<div class="cell-sub">${esc(subVal)}</div>`:""}</td>
+    ${colFields.map(f => {
+      let val = r.data[f.key];
+      if (f.type === "user") val = usersIdx[val]?.name || "-";
+      if (f.badge) return `<td><span class="badge ${badgeClassFor(f, r.data[f.key])}">${esc((val||"").toString().toUpperCase())}</span></td>`;
+      return `<td>${esc(val || "-")}</td>`;
+    }).join("")}
+    <td>${esc(usersIdx[r.created_by]?.name || "-")}</td>
+    <td>
+      <button class="icon-btn view" data-action="view-module" data-id="${r.id}" data-module="${mod}" title="Lihat (Tampilan Modern)">&#128065;</button>
+      ${mod === "hiradc" ? `<button class="icon-btn view-alt" data-action="hiradc-view-official" data-id="${r.id}" title="Lihat Dokumen Resmi">&#128065;</button>` : ""}
+      <button class="icon-btn edit" data-action="edit-module" data-id="${r.id}" data-module="${mod}" title="Edit">&#9998;</button>
+      <button class="icon-btn del" data-action="delete-module" data-id="${r.id}" data-module="${mod}" title="Hapus">&#128465;</button>
+    </td>
+  </tr>`;
+}
+
+function moduleStatCardsHtml(schema, rows) {
+  if (!schema.statCards) return "";
+  const cards = schema.statCards(rows);
+  return `<div class="module-stat-row">${cards.map(c => `
+    <div class="module-stat-card msc-${c.color}">
+      <div class="msc-label">${esc(c.label)}</div>
+      <div class="msc-value">${c.icon || ""} ${c.value}</div>
+    </div>`).join("")}</div>`;
+}
+
+function renderGenericModule(mod) {
+  const schema = MODULE_SCHEMAS[mod];
+  const usersIdx = indexById("users");
+  const rows = DATA.generic.filter(r => r.module === mod)
+    .filter(r => passesProjectFilter(genericRecordLocation(r)) && passesGlobalSearch(...genericSearchHaystack(mod, r)))
+    .sort((a,b)=>(b.record_date||"").localeCompare(a.record_date||""));
+  const titleField = schema.fields.find(f => f.title);
+  const subField = schema.fields.find(f => f.sub);
+  const colFields = schema.fields.filter(f => f.col && f !== titleField && f !== subField);
+
+  setContent(`
+    <div class="panel">
+      <div class="table-toolbar">
+        <div><div class="panel-title">${esc(schema.label.toUpperCase())}</div><div class="panel-subtitle">${rows.length} data tercatat</div></div>
+        <button class="btn btn-primary" id="openModuleModal">+ Tambah Data</button>
+      </div>
+      ${moduleStatCardsHtml(schema, rows)}
+      <div class="table-scroll"><table class="data-table">
+        <thead><tr><th>${esc(titleField?.label || "Judul")}</th>${colFields.map(f=>`<th>${esc(f.label)}</th>`).join("")}<th>Pemilik</th><th>Aksi</th></tr></thead>
+        <tbody>
+          ${rows.length ? rows.map(r => renderGenericRow(mod, r, titleField, subField, colFields, usersIdx)).join("") : `<tr><td colspan="${colFields.length+3}" class="empty-state">${noDataMessage(`Belum ada data pada modul ${esc(schema.label)}.`)}</td></tr>`}
+        </tbody>
+      </table></div>
+    </div>
+    ${genericModalShell()}
+  `);
+
+  document.getElementById("openModuleModal").addEventListener("click", () => openGenericAdd(mod));
+  document.getElementById("moduleForm").addEventListener("submit", genericFormSubmitHandler);
+}
+
+/* ---- CAPA: tampilan kartu + aksi cepat "Rubah Status" ---- */
+function capaCardHtml(r) {
+  const sevClass = { Low: "sev-border-low", Medium: "sev-border-medium", High: "sev-border-high", Critical: "sev-border-critical" }[r.data.severity] || "";
+  return `
+  <div class="capa-card ${sevClass}">
+    <div class="capa-code">${esc(r.data.finding_code || ("CAPA-" + r.id))} &middot; ${esc(r.data.kategori || "-")}</div>
+    <div class="capa-title">${esc(r.data.judul || r.title)}</div>
+    <div class="capa-desc">${esc(r.data.deskripsi || "")}</div>
+    <div class="capa-meta"><span>&#128205; ${esc(r.data.lokasi || "-")}</span><span class="badge ${SEVERITY_COLORS[r.data.severity]||''}">${esc((r.data.severity||"-").toUpperCase())}</span></div>
+    <div class="capa-actions">
+      <select class="status-quick" data-action="capa-status" data-id="${r.id}">
+        ${STATUS_OPTIONS.map(s=>`<option value="${s}" ${r.status===s?"selected":""}>${s}</option>`).join("")}
+      </select>
+      <button class="icon-btn view" data-action="view-module" data-id="${r.id}" data-module="capa" title="Lihat">&#128065;</button>
+      <button class="icon-btn edit" data-action="edit-module" data-id="${r.id}" data-module="capa" title="Edit">&#9998;</button>
+      <button class="icon-btn del" data-action="delete-module" data-id="${r.id}" data-module="capa" title="Hapus">&#128465;</button>
+    </div>
+  </div>`;
+}
+function renderCapaModule() {
+  const rows = DATA.generic.filter(r => r.module === "capa")
+    .filter(r => passesProjectFilter(genericRecordLocation(r)) && passesGlobalSearch(...genericSearchHaystack("capa", r)))
+    .sort((a,b)=>(b.record_date||"").localeCompare(a.record_date||""));
+  setContent(`
+    <div class="panel">
+      <div class="table-toolbar">
+        <div><div class="panel-title">TINDAKAN PERBAIKAN (CAPA)</div><div class="panel-subtitle">${rows.length} temuan tercatat &mdash; tampilan kartu, ubah status langsung dari kartu</div></div>
+        <button class="btn btn-primary" id="openModuleModal">+ Tambah Data</button>
+      </div>
+      <div class="card-grid">
+        ${rows.length ? rows.map(capaCardHtml).join("") : `<div class="empty-state">${noDataMessage("Belum ada data CAPA.")}</div>`}
+      </div>
+    </div>
+    ${genericModalShell()}
+  `);
+  document.getElementById("openModuleModal").addEventListener("click", () => openGenericAdd("capa"));
+  document.getElementById("moduleForm").addEventListener("submit", genericFormSubmitHandler);
+}
+
+/* ---- Kalender Keselamatan: kalender bulan penuh ---- */
+let CAL_STATE = null;
+function calInit() { if (!CAL_STATE) { const d = new Date(); CAL_STATE = { year: d.getFullYear(), month: d.getMonth() }; } }
+
+function renderKalenderModule() {
+  calInit();
+  const rows = DATA.generic.filter(r => r.module === "kalender")
+    .filter(r => passesProjectFilter(genericRecordLocation(r)) && passesGlobalSearch(...genericSearchHaystack("kalender", r)));
+  const catCounts = {};
+  ["Meeting","Training","Emergency","Inspection","Audit"].forEach(c => catCounts[c] = 0);
+  rows.forEach(r => { const c = r.data.kategori; if (catCounts[c] !== undefined) catCounts[c]++; });
+
+  const { year, month } = CAL_STATE;
+  const monthLabel = `${MONTH_FULL[month]} ${year}`;
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr = isoDate(new Date());
+
+  let cells = "";
+  for (let i = 0; i < firstDow; i++) cells += `<div class="cal-cell"></div>`;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${pad(month+1)}-${pad(day)}`;
+    const dayEvents = rows.filter(r => r.data.tanggal_mulai <= dateStr && (r.data.tanggal_selesai || r.data.tanggal_mulai) >= dateStr);
+    cells += `<div class="cal-cell ${dateStr===todayStr?'today':''}">
+      <div class="cal-daynum">${day}</div>
+      ${dayEvents.slice(0,3).map(ev => `<span class="cal-event" style="background:${CAL_CATEGORY_COLOR[ev.data.kategori]||'#4a3aa7'}" data-action="view-module" data-id="${ev.id}" data-module="kalender" title="${esc(ev.data.nama_kegiatan)}">${esc(ev.data.nama_kegiatan)}</span>`).join("")}
+      ${dayEvents.length>3?`<span class="cal-event" style="background:#5a6182;">+${dayEvents.length-3} lainnya</span>`:""}
+    </div>`;
+  }
+  const totalCells = firstDow + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for (let i = 0; i < trailing; i++) cells += `<div class="cal-cell"></div>`;
+
+  setContent(`
+    <div class="panel">
+      <div class="cal-toolbar">
+        <div><div class="panel-title">KALENDER KESELAMATAN KERJA</div><div class="panel-subtitle">Pantau seluruh jadwal &amp; kegiatan K3 dalam satu tampilan &mdash; ${rows.length} kegiatan tercatat</div></div>
+        <button class="btn btn-primary" id="openModuleModal">+ Tambah Kegiatan</button>
+      </div>
+      <div class="cal-cat-row">
+        ${Object.entries(catCounts).map(([c,n]) => `<div class="cal-cat" style="background:${CAL_CATEGORY_COLOR[c]}"><div>${esc(c)}</div><div class="cc-count">${n}</div></div>`).join("")}
+      </div>
+      <div class="cal-nav">
+        <button type="button" data-action="cal-prev">&#8249;</button>
+        <div class="cal-month-label">${esc(monthLabel)}</div>
+        <button type="button" data-action="cal-next">&#8250;</button>
+      </div>
+      <div class="cal-grid" style="margin-top:12px;">
+        ${["MIN","SEN","SEL","RAB","KAM","JUM","SAB"].map(d=>`<div class="cal-dow">${d}</div>`).join("")}
+        ${cells}
+      </div>
+    </div>
+    ${genericModalShell()}
+  `);
+  document.getElementById("openModuleModal").addEventListener("click", () => openGenericAdd("kalender"));
+  document.getElementById("moduleForm").addEventListener("submit", genericFormSubmitHandler);
+}
+
+/* ---- Pusat Dokumen: daftar dokumen + statistik total/expired/warning ---- */
+function renderDokumenModule() {
+  const rows = DATA.generic.filter(r => r.module === "dokumen")
+    .filter(r => passesProjectFilter(genericRecordLocation(r)) && passesGlobalSearch(...genericSearchHaystack("dokumen", r)))
+    .sort((a,b)=>(b.record_date||"").localeCompare(a.record_date||""));
+  const today = isoDate(new Date());
+  const in30 = isoDate(addDays(new Date(), 30));
+  let expired = 0, warning = 0;
+  rows.forEach(r => { const exp = r.data.masa_berlaku; if (!exp) return; if (exp < today) expired++; else if (exp <= in30) warning++; });
+  const kategoriIcon = { "Dokumen Prosedur (SOP)": "&#128213;", "Form / Template": "&#128214;", "Laporan": "&#128202;", "Kebijakan": "&#128216;", "Manual": "&#128215;" };
+
+  setContent(`
+    <div class="panel">
+      <div class="table-toolbar">
+        <div><div class="panel-title">ARSIP DOKUMEN K3</div><div class="panel-subtitle">Simpan &amp; pantau masa berlaku seluruh dokumen kepatuhan HSE</div></div>
+        <button class="btn btn-primary" id="openModuleModal">&#8593; Upload Dokumen</button>
+      </div>
+      <div class="doc-stat-row">
+        <div class="doc-stat"><div class="ds-label">TOTAL FILE</div><div class="ds-value">${rows.length}</div></div>
+        <div class="doc-stat"><div class="ds-label">EXPIRED</div><div class="ds-value" style="color:#c92a2a;">${expired}</div></div>
+        <div class="doc-stat"><div class="ds-label">WARNING</div><div class="ds-value" style="color:#e8a300;">${warning}</div></div>
+      </div>
+      <div>
+        ${rows.length ? rows.map(r => {
+          const exp = r.data.masa_berlaku;
+          let statusLabel = "Active", statusClass = "doc-active";
+          if (exp && exp < today) { statusLabel = "Expired"; statusClass = "doc-expired"; }
+          else if (exp && exp <= in30) { statusLabel = "Warning"; statusClass = "doc-warning"; }
+          return `<div class="doc-list-row">
+            <div class="doc-icon">${kategoriIcon[r.data.kategori] || "&#128196;"}</div>
+            <div class="doc-info"><div class="di-name">${esc(r.data.judul_dokumen)}</div><div class="di-meta">${esc(r.data.kategori || "-")}</div></div>
+            <div class="doc-col">${esc(r.data.tanggal_upload || "-")}</div>
+            <div class="doc-col">${exp ? esc(exp) : "Permanen"}</div>
+            <div class="doc-col"><span class="badge ${statusClass}">${esc(statusLabel.toUpperCase())}</span></div>
+            <div>
+              <button class="icon-btn view" data-action="view-module" data-id="${r.id}" data-module="dokumen" title="Lihat">&#128065;</button>
+              <button class="icon-btn edit" data-action="edit-module" data-id="${r.id}" data-module="dokumen" title="Edit">&#9998;</button>
+              <button class="icon-btn del" data-action="delete-module" data-id="${r.id}" data-module="dokumen" title="Hapus">&#128465;</button>
+            </div>
+          </div>`;
+        }).join("") : `<div class="empty-state">${noDataMessage("Belum ada dokumen.")}</div>`}
+      </div>
+    </div>
+    ${genericModalShell()}
+  `);
+  document.getElementById("openModuleModal").addEventListener("click", () => openGenericAdd("dokumen"));
+  document.getElementById("moduleForm").addEventListener("submit", genericFormSubmitHandler);
+}
+
+function renderSettings() {
+  const u = byId("users", CURRENT_USER_ID);
+  setContent(`
+    <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+      <div class="panel">
+        <div class="panel-title">PENGATURAN PROFIL</div>
+        <div class="panel-subtitle">Ubah data akun Anda di sini</div>
+        <form id="settingsForm">
+          <div class="form-group"><label>Nama</label><input class="text-input" name="name" value="${esc(u.name)}"></div>
+          <div class="form-group"><label>Email</label><input class="text-input" value="${esc(u.email)}" disabled></div>
+          <div class="form-group"><label>No. WhatsApp</label><input class="text-input" name="phone" value="${esc(u.phone||"")}"></div>
+          <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="panel-title">PENGATURAN PERUSAHAAN</div>
+        <div class="panel-subtitle">Identitas ini tampil di sidebar &amp; kop dokumen yang dicetak</div>
+        <form id="companySettingsForm">
+          <div class="form-group"><label>Nama Perusahaan</label><input class="text-input" name="name" value="${esc(COMPANY?.name||"")}" required></div>
+          <div class="form-group"><label>Bidang Usaha</label><input class="text-input" name="industry" value="${esc(COMPANY?.industry||"")}" placeholder="Contoh: Konstruksi, Manufaktur..."></div>
+          <div class="form-group"><label>Alamat</label><input class="text-input" name="address" value="${esc(COMPANY?.address||"")}"></div>
+          <div class="form-group"><label>No. Telepon</label><input class="text-input" name="phone" value="${esc(COMPANY?.phone||"")}"></div>
+          <div class="form-group">
+            <label>Logo Perusahaan</label>
+            <label class="logo-upload-btn">&#128247; ${COMPANY?.logo ? "Ganti Logo" : "Pilih Logo"}<input type="file" accept="image/*" class="hidden" id="companyLogoInput"></label>
+            <div class="logo-preview-row" id="companyLogoPreview">${COMPANY?.logo ? `<img src="${COMPANY.logo}" alt="Logo"><button type="button" class="logo-remove-btn" data-action="remove-company-logo">&times; Hapus</button>` : ""}</div>
+          </div>
+          <button class="btn btn-primary" type="submit">Simpan Perusahaan</button>
+        </form>
+      </div>
+    </div>
+  `);
+  document.getElementById("settingsForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    u.name = f.get("name"); u.phone = f.get("phone");
+    FLASH = { type: "success", message: "Profil diperbarui." };
+    renderUserChrome();
+    renderSettings();
+  });
+  document.getElementById("companySettingsForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const name = (f.get("name") || "").trim();
+    if (!name) return;
+    COMPANY = {
+      ...COMPANY, name, industry: (f.get("industry")||"").trim(), address: (f.get("address")||"").trim(), phone: (f.get("phone")||"").trim(),
+      logo: PENDING_COMPANY_LOGO !== null ? PENDING_COMPANY_LOGO : (COMPANY?.logo || null),
+    };
+    PENDING_COMPANY_LOGO = null;
+    saveCompany();
+    renderCompanyChrome();
+    FLASH = { type: "success", message: "Data perusahaan diperbarui." };
+    renderSettings();
+  });
+  PENDING_COMPANY_LOGO = null;
+  document.getElementById("companyLogoInput").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 1024 * 1024) { alert("Ukuran logo maksimal 1MB."); e.target.value = ""; return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      PENDING_COMPANY_LOGO = reader.result;
+      document.getElementById("companyLogoPreview").innerHTML = `<img src="${PENDING_COMPANY_LOGO}" alt="Logo"><button type="button" class="logo-remove-btn" data-action="remove-company-logo">&times; Batal</button>`;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------------------------- modal + misc helpers ------------------------ */
+function openModal(id) { document.getElementById(id).classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+function nowLocalInput() { const d = new Date(); return `${isoDate(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === "close-modal") closeModal(btn.dataset.target);
+  if (action === "remove-setup-logo") {
+    PENDING_SETUP_LOGO = null;
+    document.getElementById("setupLogoInput").value = "";
+    document.getElementById("setupLogoPreview").innerHTML = "";
+  }
+  if (action === "remove-company-logo") {
+    if (PENDING_COMPANY_LOGO) {
+      PENDING_COMPANY_LOGO = null;
+    } else {
+      COMPANY = { ...COMPANY, logo: null };
+      saveCompany();
+      renderCompanyChrome();
+    }
+    renderSettings();
+  }
+  if (action === "goto-hash") {
+    document.getElementById("notifPanel").classList.remove("open");
+    location.hash = btn.dataset.hash;
+  }
+  if (action === "goto-filter") {
+    PENDING_FILTER = btn.dataset.filter || "";
+    if (currentRoute().key === "insiden") { renderIncidents(PENDING_FILTER); PENDING_FILTER = null; }
+    else { location.hash = "#/insiden"; }
+  }
+  if (action === "switch-user") {
+    CURRENT_USER_ID = Number(btn.dataset.id);
+    closeModal("userSwitchModal");
+    FLASH = { type: "success", message: "Pengguna aktif diganti." };
+    render();
+  }
+  if (action === "delete-incident") {
+    if (!confirm("Hapus insiden ini?")) return;
+    DATA.incidents = DATA.incidents.filter(r => r.id !== Number(btn.dataset.id));
+    FLASH = { type: "success", message: "Insiden dihapus." };
+    renderIncidents("");
+  }
+  if (action === "hiradc-view-official") {
+    const r = byId("generic", Number(btn.dataset.id));
+    if (r) openView(hiradcOfficialViewCard(r, indexById("users")));
+  }
+  if (action === "hiradc-view-modern") {
+    const r = byId("generic", Number(btn.dataset.id));
+    if (r) openView(hiradcViewCard(r, indexById("users")));
+  }
+  if (action === "view-incident") viewIncident(Number(btn.dataset.id));
+  if (action === "edit-incident") openIncidentForm(Number(btn.dataset.id));
+  if (action === "delete-team") {
+    if (Number(btn.dataset.id) === CURRENT_USER_ID) { FLASH = { type: "error", message: "Tidak bisa menghapus akun Anda sendiri." }; renderTeam(); return; }
+    if (!confirm("Hapus anggota ini?")) return;
+    DATA.users = DATA.users.filter(r => r.id !== Number(btn.dataset.id));
+    FLASH = { type: "success", message: "Anggota tim dihapus." };
+    renderTeam();
+  }
+  if (action === "view-team") viewTeam(Number(btn.dataset.id));
+  if (action === "edit-team") openTeamForm(Number(btn.dataset.id));
+  if (action === "delete-module") {
+    if (!confirm("Hapus data ini?")) return;
+    DATA.generic = DATA.generic.filter(r => r.id !== Number(btn.dataset.id));
+    FLASH = { type: "success", message: "Data dihapus." };
+    renderModule(btn.dataset.module);
+  }
+  if (action === "view-module") viewGenericRecord(btn.dataset.module, Number(btn.dataset.id));
+  if (action === "edit-module") openGenericEdit(btn.dataset.module, Number(btn.dataset.id));
+  if (action === "delete-attachment") {
+    if (!confirm("Hapus berkas ini?")) return;
+    const rec = findRecordByKind(btn.dataset.kind, btn.dataset.id);
+    if (rec) rec.attachments = (rec.attachments || []).filter(a => String(a.id) !== btn.dataset.att);
+    reopenCurrentView();
+  }
+  if (action === "cal-prev") { calInit(); CAL_STATE.month--; if (CAL_STATE.month < 0) { CAL_STATE.month = 11; CAL_STATE.year--; } renderKalenderModule(); }
+  if (action === "cal-next") { calInit(); CAL_STATE.month++; if (CAL_STATE.month > 11) { CAL_STATE.month = 0; CAL_STATE.year++; } renderKalenderModule(); }
+});
+
+document.addEventListener("change", e => {
+  const sel = e.target.closest("[data-action='capa-status']");
+  if (sel) {
+    const r = byId("generic", Number(sel.dataset.id));
+    if (!r) return;
+    r.status = sel.value; r.data.status = sel.value;
+    FLASH = { type: "success", message: "Status CAPA diperbarui." };
+    renderCapaModule();
+    return;
+  }
+  const input = e.target.closest('[data-action-change="upload-attachment"]');
+  if (input) {
+    const kind = input.dataset.kind, id = input.dataset.id;
+    const rec = findRecordByKind(kind, id);
+    const files = [...input.files];
+    if (!rec || !files.length) return;
+    const MAX = 5 * 1024 * 1024;
+    const oversized = files.filter(f => f.size > MAX);
+    const valid = files.filter(f => f.size <= MAX);
+    if (oversized.length) alert(`Berkas berikut melebihi 5MB dan dilewati:\n${oversized.map(f => f.name).join("\n")}`);
+    if (!valid.length) { input.value = ""; return; }
+    let pending = valid.length;
+    valid.forEach((file, i) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        rec.attachments = rec.attachments || [];
+        rec.attachments.push({ id: `${Date.now()}-${i}`, name: file.name, type: file.type, size: file.size, dataUrl: reader.result, uploaded_at: isoDateTime(new Date()) });
+        pending--;
+        if (pending === 0) { input.value = ""; reopenCurrentView(); }
+      };
+      reader.onerror = () => { pending--; if (pending === 0) { input.value = ""; reopenCurrentView(); } };
+      reader.readAsDataURL(file);
+    });
+  }
+});
+
+/* ---------------------------- setup perusahaan / shell toggle -------------- */
+function showSetup() {
+  document.getElementById("appShell").classList.add("hidden");
+  document.getElementById("setupScreen").classList.remove("hidden");
+}
+function renderCompanyChrome() {
+  document.getElementById("sidebarCompanyName").innerHTML = COMPANY?.logo
+    ? `<img src="${COMPANY.logo}" alt="Logo" class="sidebar-company-logo">${esc(COMPANY?.name || "")}`
+    : esc(COMPANY?.name || "");
+}
+function showApp() {
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("appShell").classList.remove("hidden");
+  renderCompanyChrome();
+  renderUserChrome();
+  renderNotifications();
+  renderTopbarFilters();
+}
+
+/* ---------------------------- notifikasi (dihitung nyata dari data, bukan AI) ---- */
+function computeNotifications() {
+  const today = isoDate(new Date());
+  const in7 = isoDate(addDays(new Date(), 7));
+  const notifs = [];
+  const addIf = (date, level, icon, text, hash) => notifs.push({ date, level, icon, text, hash });
+
+  DATA.generic.filter(r => r.module === "dokumen").forEach(r => {
+    const exp = r.data.masa_berlaku; if (!exp) return;
+    if (exp < today) addIf(exp, "critical", "&#128196;", `Dokumen "${r.title}" sudah kadaluarsa (${exp}).`, "#/modul/dokumen");
+    else if (exp <= in7) addIf(exp, "warning", "&#128196;", `Dokumen "${r.title}" akan kadaluarsa ${exp}.`, "#/modul/dokumen");
+  });
+  DATA.generic.filter(r => r.module === "sertifikasi").forEach(r => {
+    const exp = r.data.tanggal_kadaluarsa; if (!exp) return;
+    if (exp < today) addIf(exp, "critical", "&#127891;", `Sertifikasi "${r.title}" sudah kadaluarsa (${exp}).`, "#/modul/sertifikasi");
+    else if (exp <= in7) addIf(exp, "warning", "&#127891;", `Sertifikasi "${r.title}" akan kadaluarsa ${exp}.`, "#/modul/sertifikasi");
+  });
+  DATA.generic.filter(r => r.module === "legal" && r.status !== "Closed").forEach(r => {
+    const dl = r.data.tenggat_waktu; if (!dl) return;
+    if (dl < today) addIf(dl, "critical", "&#9878;", `Tenggat "${r.title}" sudah lewat (${dl}).`, "#/modul/legal");
+    else if (dl <= in7) addIf(dl, "warning", "&#9878;", `Tenggat "${r.title}" jatuh tempo ${dl}.`, "#/modul/legal");
+  });
+  DATA.generic.filter(r => r.module === "ptw" && !["Closed","Rejected"].includes(r.status)).forEach(r => {
+    const end = r.data.berlaku_sampai; if (!end) return;
+    if (end < today) addIf(end, "critical", "&#128737;", `Izin Kerja "${r.title}" sudah lewat masa berlaku (${end}) tapi belum ditutup.`, "#/modul/ptw");
+  });
+  DATA.users.forEach(u => {
+    const exp = u.masa_berlaku_sertifikat; if (!exp) return;
+    if (exp < today) addIf(exp, "critical", "&#128100;", `Sertifikat kompetensi ${u.name} sudah kadaluarsa (${exp}).`, "#/tim");
+    else if (exp <= in7) addIf(exp, "warning", "&#128100;", `Sertifikat kompetensi ${u.name} akan kadaluarsa ${exp}.`, "#/tim");
+  });
+  DATA.incidents.filter(i => i.status !== "Closed" && ["Critical","High"].includes(i.severity)).forEach(i => {
+    addIf(i.occurred_at || today, i.severity === "Critical" ? "critical" : "warning", "&#9888;", `Insiden "${i.name}" (${i.severity}) masih berstatus ${i.status}.`, "#/insiden");
+  });
+
+  const order = { critical: 0, warning: 1 };
+  notifs.sort((a, b) => (order[a.level] - order[b.level]) || String(a.date).localeCompare(String(b.date)));
+  return notifs;
+}
+
+function renderNotifications() {
+  const notifs = computeNotifications();
+  document.getElementById("bellDot").style.display = notifs.length ? "block" : "none";
+  document.getElementById("notifList").innerHTML = notifs.length
+    ? notifs.slice(0, 20).map(n => `<div class="notif-item ${n.level}" data-action="goto-hash" data-hash="${n.hash}"><div class="ni-icon">${n.icon}</div><div class="ni-text">${esc(n.text)}</div></div>`).join("")
+    : `<div class="notif-empty">Tidak ada notifikasi saat ini &mdash; semua status aman. &#9989;</div>`;
+}
+
+let PENDING_SETUP_LOGO = null;
+document.getElementById("setupLogoInput").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 1024 * 1024) { alert("Ukuran logo maksimal 1MB."); e.target.value = ""; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    PENDING_SETUP_LOGO = reader.result;
+    document.getElementById("setupLogoPreview").innerHTML = `<img src="${PENDING_SETUP_LOGO}" alt="Logo"><button type="button" class="logo-remove-btn" data-action="remove-setup-logo">&times; Hapus</button>`;
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById("companySetupForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const mode = e.submitter?.value || "demo";
+  const f = new FormData(e.target);
+  const name = (f.get("name") || "").trim();
+  const picName = (f.get("pic_name") || "").trim();
+  const picRole = (f.get("pic_role") || "").trim();
+  if (!name || !picName || !picRole) return;
+  COMPANY = {
+    name, industry: (f.get("industry")||"").trim(), address: (f.get("address")||"").trim(), phone: (f.get("phone")||"").trim(),
+    picName, picRole, logo: PENDING_SETUP_LOGO || null,
+  };
+  saveCompany();
+  DATA = emptyData();
+  const pic = { id: nextId("users"), name: picName, email: "", phone: "", role: picRole, status: "Active", competency_expiry: null, points: 0 };
+  DATA.users.push(pic);
+  CURRENT_USER_ID = pic.id;
+  if (mode === "demo") seedDemoContent();
+  FLASH = { type: "success", message: `Selamat datang, ${esc(picName)}!` };
+  location.hash = "#/dashboard";
+  showApp();
+  render();
+});
+
+document.getElementById("bellBtn").addEventListener("click", e => {
+  if (e.target.closest("#notifPanel")) return; // biarkan klik item notifikasi diteruskan ke handler data-action
+  e.stopPropagation();
+  document.getElementById("notifPanel").classList.toggle("open");
+});
+document.addEventListener("click", e => {
+  const panel = document.getElementById("notifPanel");
+  if (panel.classList.contains("open") && !e.target.closest("#bellBtn")) panel.classList.remove("open");
+});
+
+/* Filter topbar: dropdown "Proyek" & pencarian global — aktif di semua halaman daftar */
+document.getElementById("topbarProjectFilter").addEventListener("change", e => {
+  TOPBAR_PROJECT_FILTER = e.target.value;
+  render();
+});
+document.getElementById("globalSearch").addEventListener("input", debounce(() => {
+  TOPBAR_SEARCH_FILTER = document.getElementById("globalSearch").value.trim();
+  render();
+}, 250));
+
+/* Mobile: sidebar jadi drawer — dibuka lewat tombol hamburger, ditutup lewat overlay
+   atau otomatis setelah memilih salah satu menu navigasi. */
+function closeSidebarDrawer() { document.getElementById("appShell").classList.remove("sidebar-open"); }
+document.getElementById("sidebarToggle").addEventListener("click", () => {
+  document.getElementById("appShell").classList.toggle("sidebar-open");
+});
+document.getElementById("sidebarBackdrop").addEventListener("click", closeSidebarDrawer);
+document.querySelector(".sidebar").addEventListener("click", e => {
+  if (e.target.closest(".nav-item")) closeSidebarDrawer();
+});
+
+/* Pengganti login/password: cukup pilih siapa yang sedang memakai aplikasi ini. */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  document.getElementById("userSwitchList").innerHTML = DATA.users.map(u => `
+    <div class="user-switch-row ${u.id === CURRENT_USER_ID ? "active" : ""}" data-action="switch-user" data-id="${u.id}">
+      <div class="user-avatar">${esc(initials(u.name))}</div>
+      <div><div class="usw-name">${esc(u.name)}</div><div class="usw-role">${esc(u.role)}</div></div>
+    </div>`).join("") || `<div class="empty-state">Belum ada anggota tim. Tambahkan lewat menu Manajemen Tim.</div>`;
+  openModal("userSwitchModal");
+});
+
+document.getElementById("resetDataBtn").addEventListener("click", () => {
+  if (!confirm("Ini akan mengganti seluruh data saat ini dengan data kosong (tanpa insiden/proyek contoh, tapi akun tim tetap ada). Profil perusahaan tidak ikut terhapus. Lanjutkan?")) return;
+  const keepUsers = DATA.users.map(u => ({ ...u }));
+  DATA = emptyData();
+  keepUsers.forEach(u => { DATA.users.push(u); DATA.next_id.users = Math.max(DATA.next_id.users, u.id + 1); });
+  if (!keepUsers.some(u => u.id === CURRENT_USER_ID)) CURRENT_USER_ID = DATA.users[0]?.id || null;
+  FLASH = { type: "success", message: "Data direset ke kondisi kosong." };
+  location.hash = "#/dashboard";
+  render();
+});
+
+/* ---------------------------- export / import ------------------------------ */
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const payload = { ...DATA, company: COMPANY };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = isoDate(new Date());
+  a.href = url; a.download = `hse-omni-pro-data-${stamp}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+function applyImportedData(parsed) {
+  if (!parsed.users || !parsed.incidents) throw new Error("Struktur file tidak dikenali.");
+  const importedCompany = parsed.company || null;
+  delete parsed.company;
+  DATA = parsed;
+  DATA.next_id = DATA.next_id || { users: 1, projects: 1, incidents: 1, generic: 1 };
+  ["users","projects","incidents","generic"].forEach(c => {
+    DATA[c] = DATA[c] || [];
+    DATA.next_id[c] = Math.max(DATA.next_id[c] || 1, ...(DATA[c].map(r=>r.id+1)), 1);
+  });
+  if (importedCompany && importedCompany.name) { COMPANY = importedCompany; saveCompany(); }
+  CURRENT_USER_ID = DATA.users[0]?.id || null;
+  return importedCompany;
+}
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      applyImportedData(parsed);
+      alert("Data berhasil di-import.");
+      location.hash = "#/dashboard";
+      if (COMPANY) { showApp(); render(); } else { showSetup(); }
+    } catch (err) {
+      alert("Gagal import: file JSON tidak valid (" + err.message + ").");
+    }
+    e.target.value = "";
+  };
+  reader.readAsText(file);
+});
+document.getElementById("setupImportBtn").addEventListener("click", () => document.getElementById("setupImportFile").click());
+document.getElementById("setupImportFile").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const importedCompany = applyImportedData(parsed);
+      if (!importedCompany || !importedCompany.name) {
+        throw new Error("File ini tidak berisi data profil perusahaan. Silakan isi form setup secara manual.");
+      }
+      location.hash = "#/dashboard";
+      showApp();
+      render();
+    } catch (err) {
+      alert("Gagal import: file JSON tidak valid (" + err.message + ").");
+    }
+    e.target.value = "";
+  };
+  reader.readAsText(file);
+});
+
+/* ---------------------------- boot ------------------------------------------ */
+paintLogos();
+loadCompany();
+if (DEMO_MODE) {
+  /* Demo publik: langsung tampilkan Dashboard berisi data contoh tanpa perlu
+     mengisi form setup, supaya pengunjung bisa langsung mencoba aplikasinya. */
+  COMPANY = {
+    name: "PT Demo HSE OMNI PRO", industry: "Konstruksi & Industri Umum",
+    address: "Versi Demo — data akan direset setiap kunjungan baru", phone: "",
+    picName: "Tim Demo", picRole: "HSE Manager", logo: null,
+  };
+  DATA = emptyData();
+  const pic = { id: nextId("users"), name: COMPANY.picName, email: "", phone: "", role: COMPANY.picRole, status: "Active", competency_expiry: null, points: 0 };
+  DATA.users.push(pic);
+  CURRENT_USER_ID = pic.id;
+  seedDemoContent();
+  FLASH = { type: "warning", message: "Anda sedang mencoba versi DEMO HSE OMNI PRO — jelajahi bebas semua menu. Klik \"Tambah Data\" di mana saja untuk mulai berlangganan versi lengkap." };
+  location.hash = "#/dashboard";
+  showApp();
+  render();
+  document.getElementById("demoCtaPill").classList.remove("hidden");
+} else if (COMPANY && COMPANY.name && COMPANY.picName) {
+  /* Profil perusahaan sudah pernah di-setup di browser ini — data operasional
+     tetap mulai kosong tiap sesi baru (sesuai desain: hanya tersimpan lewat
+     Export/Import manual), tapi identitas PIC dipulihkan agar tidak perlu
+     setup ulang. Import file JSON akan menimpa roster tim ini dengan yang asli. */
+  DATA = emptyData();
+  const pic = { id: nextId("users"), name: COMPANY.picName, email: "", phone: "", role: COMPANY.picRole || "Admin", status: "Active", competency_expiry: null, points: 0 };
+  DATA.users.push(pic);
+  CURRENT_USER_ID = pic.id;
+  showApp();
+  render();
+} else {
+  DATA = emptyData();
+  showSetup();
+}
+deEmojify(document.body);
+_deEmojifyObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+</script>
+</body>
+</html>

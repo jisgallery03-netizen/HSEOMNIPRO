@@ -1,0 +1,12 @@
+{
+  "name": "hse-omni-pro-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HSE OMNI PRO - versi demo publik (Railway)",
+  "scripts": {
+    "start": "serve -l ${PORT:-3000} ."
+  },
+  "dependencies": {
+    "serve": "^14.2.1"
+  }
+}
