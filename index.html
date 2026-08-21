@@ -78,6 +78,18 @@ button { font-family:inherit; }
 
 .main { flex:1; min-width:0; display:flex; flex-direction:column; }
 .topbar { display:flex; align-items:center; gap:14px; padding:14px 26px; background:#fff; border-bottom:1px solid var(--gray-200); position:sticky; top:0; z-index:5; flex-wrap:wrap; }
+.update-banner { position:relative; display:flex; align-items:center; gap:12px; padding:10px 26px; background:linear-gradient(90deg,#1a1443,#0e2a4a,#123a52,#1a1443); background-size:300% 100%; animation:updateBannerShimmer 8s ease-in-out infinite; color:#fff; font-size:12.5px; overflow:hidden; }
+.update-banner::before { content:""; position:absolute; inset:0; background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.14) 45%, transparent 60%); background-size:200% 100%; animation:updateBannerSheen 3.5s linear infinite; pointer-events:none; }
+@keyframes updateBannerShimmer { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
+@keyframes updateBannerSheen { 0% { background-position:-40% 0; } 100% { background-position:140% 0; } }
+.update-banner-badge { flex-shrink:0; display:inline-flex; align-items:center; gap:4px; background:linear-gradient(135deg,#22d3ee,#7c5cff); color:#0a0e1c; font-weight:900; font-size:10.5px; letter-spacing:.5px; padding:4px 10px; border-radius:999px; box-shadow:0 0 12px rgba(34,211,238,.55); }
+.update-banner-text { flex:1; min-width:0; line-height:1.4; }
+.update-banner-text strong { color:#7dd3fc; }
+.update-banner-close { flex-shrink:0; background:rgba(255,255,255,.12); border:none; color:#fff; width:22px; height:22px; border-radius:6px; cursor:pointer; font-size:15px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.update-banner-close:hover { background:rgba(255,255,255,.24); }
+.update-banner.hidden { display:none; }
+@media (prefers-reduced-motion: reduce) { .update-banner, .update-banner::before { animation:none; } }
+@media (max-width:640px) { .update-banner { padding:8px 14px; font-size:11.5px; } .update-banner-text { font-size:11px; } }
 .topbar .proyek-select { display:flex; align-items:center; gap:8px; padding:8px 14px; border-radius:10px; background:var(--gray-100); font-size:13px; font-weight:600; color:var(--gray-800); cursor:pointer; }
 .topbar .proyek-select select.proyek-select-input { border:none; background:transparent; outline:none; font-size:13px; font-weight:600; color:var(--gray-800); cursor:pointer; font-family:inherit; min-width:150px; }
 .topbar .proyek-select select.proyek-select-input:focus { outline:2px solid var(--green-500); outline-offset:2px; border-radius:4px; }
@@ -277,6 +289,7 @@ table.data-table tr:hover td { background:var(--gray-50); }
 .bar-col .bar-stack { width:100%; max-width:34px; display:flex; flex-direction:column-reverse; gap:3px; border-radius:6px 6px 0 0; overflow:hidden; }
 .bar-col .bar-seg { width:100%; border-radius:4px; min-height:3px; }
 .bar-col .bar-label { font-size:10.5px; color:var(--gray-600); font-weight:700; }
+.bar-col .bar-value { font-size:11px; font-weight:800; color:var(--text-dark); font-variant-numeric:tabular-nums; }
 .legend-row { display:flex; gap:16px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
 .legend-row .legend-item, .donut-legend .legend-item { display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--gray-600); font-weight:600; }
 .legend-dot { width:9px; height:9px; border-radius:3px; display:inline-block; flex-shrink:0; }
@@ -290,6 +303,11 @@ table.data-table tr:hover td { background:var(--gray-50); }
 .donut::after { content:""; position:absolute; inset:28px; border-radius:50%; background:#fff; }
 .donut-legend { display:flex; flex-direction:column; gap:10px; }
 .donut-legend .legend-item strong { margin-left:4px; }
+.chart-insight { margin-top:12px; padding:9px 13px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:10px; font-size:12px; line-height:1.5; color:var(--gray-700); display:flex; align-items:flex-start; gap:7px; }
+.chart-insight .ci-icon { flex-shrink:0; line-height:1.4; }
+.chart-insight strong { color:var(--text-dark); }
+.chart-glass .chart-insight { background:rgba(255,255,255,.07); border-color:rgba(255,255,255,.14); color:rgba(255,255,255,.82); }
+.chart-glass .chart-insight strong { color:#fff; }
 
 /* ---- futuristic HUD chart theme (Dashboard-only) ---- */
 .chart-glass { background:linear-gradient(160deg,#16281d 0%,#0d1a12 100%); position:relative; overflow:hidden; }
@@ -650,6 +668,11 @@ tr.row-clickable:hover { background:var(--gray-50); }
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <div class="main">
+    <div class="update-banner" id="updateBanner">
+      <span class="update-banner-badge">&#10024; V.02</span>
+      <span class="update-banner-text">Update terbaru: menu <strong>Tenaga Kerja</strong> &mdash; Employee, Man Power &amp; Safety Man Hours kini tersedia, plus tampilan yang lebih futuristik.</span>
+      <button type="button" class="update-banner-close" id="updateBannerClose" aria-label="Tutup pengumuman">&times;</button>
+    </div>
     <div class="topbar">
       <button type="button" id="sidebarToggle" class="sidebar-toggle-btn" aria-label="Buka menu navigasi">&#9776;</button>
       <div class="proyek-select">&#128205; <select id="topbarProjectFilter" class="proyek-select-input" title="Filter data berdasarkan lokasi/proyek"><option value="">Semua Proyek</option></select></div>
@@ -754,6 +777,7 @@ const NAV_GROUPS = [
     { key: "man-hours", label: "Safety Man Hours", icon: "&#9203;" },
   ]},
   { label: "Operasional", color: "#eb6834", links: [
+    { key: "hseplan", label: "HSE Plan", module: true },
     { key: "insiden", label: "Insiden", icon: "&#128680;" },
     { key: "inspeksi", label: "Inspeksi", module: true },
     { key: "capa", label: "Tindakan Perbaikan (CAPA)", module: true },
@@ -822,7 +846,7 @@ const MODULE_SCHEMAS = {
     label: "Inspeksi", icon: "&#128269;", docType: "LAPORAN HASIL INSPEKSI", bannerColor: "#2a78d6",
     fields: [
       { key: "judul", label: "Judul Inspeksi", type: "text", title: true, col: true, required: true, ph: "Contoh: Inspeksi APD Area Produksi" },
-      { key: "kategori", label: "Kategori Inspeksi", type: "select", options: ["Inspeksi APD","Inspeksi Scaffold","Inspeksi Alat Berat","Inspeksi Kebakaran","Inspeksi Umum"], col: true, sub: true },
+      { key: "kategori", label: "Kategori Inspeksi", type: "select_other", options: ["Inspeksi APD","Inspeksi Scaffold","Inspeksi Alat Berat","Inspeksi Kebakaran","Inspeksi Umum","Kantor & Fasilitas","Petugas P3K dan Fasilitas","Tempat Pabrikasi","Housekeeping dan Akses & Jalur Keluar","Bekerja di Ketinggian","Pengangkatan & Pengikatan Sling","Alat Angkat","Perancah","Alat Listrik","Alat Berat","Perilaku Orang di Tempat Kerja","JSA","Surat Ijin Kerja","Bahan Berbahaya","Pekerjaan Las, Memotong & Pekerjaan Menghasilkan Percikan Api","Pekerjaan Galian","Pekerjaan Ruang Terbatas","Penerangan","Mencari Sumber Bahaya"], col: true, sub: true },
       { key: "tanggal", label: "Tanggal Inspeksi", type: "date", col: true },
       { key: "lokasi", label: "Lokasi", type: "text", col: true },
       { key: "pic", label: "Petugas Inspeksi (PIC)", type: "user" },
@@ -830,6 +854,27 @@ const MODULE_SCHEMAS = {
       { key: "rekomendasi", label: "Rekomendasi", type: "textarea", ph: "Rekomendasi tindak lanjut..." },
       { key: "skor", label: "Nilai Assessment (%)", type: "number", ph: "0-100" },
       { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
+    ],
+  },
+  hseplan: {
+    label: "HSE Plan", icon: "&#127919;", docType: "RENCANA & PROGRAM KESELAMATAN KERJA", bannerColor: "#3730a3",
+    fields: [
+      { key: "judul", label: "Judul Rencana / Program", type: "text", title: true, col: true, required: true, ph: "Contoh: HSE Plan Proyek Konstruksi Gedung A 2026" },
+      { key: "kategori", label: "Kategori Rencana", type: "select", options: ["Rencana Tahunan","Rencana Proyek","Program Kerja Bulanan","Emergency Response Plan","Lainnya"], col: true, sub: true },
+      { key: "periode", label: "Periode", type: "text", col: true, ph: "Contoh: Januari - Desember 2026" },
+      { key: "tujuan_sasaran", label: "Tujuan & Sasaran", type: "textarea", ph: "Tujuan dan sasaran K3 yang ingin dicapai..." },
+      { key: "ruang_lingkup", label: "Ruang Lingkup", type: "textarea", ph: "Area/aktivitas yang dicakup rencana ini..." },
+      { key: "program_kerja", label: "Program Kerja & Kegiatan", type: "textarea", ph: "Daftar program/kegiatan yang akan dijalankan..." },
+      { key: "pic", label: "Penanggung Jawab", type: "user" },
+      { key: "tanggal_mulai", label: "Tanggal Mulai", type: "date", col: true },
+      { key: "tanggal_selesai", label: "Tanggal Selesai", type: "date" },
+      { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
+    ],
+    statCards: rows => [
+      { label: "Total Rencana & Program", value: rows.length, icon: "&#127919;", color: "violet" },
+      { label: "Sedang Berjalan", value: rows.filter(r=>r.data.status==="In Progress").length, icon: "&#9203;", color: "amber" },
+      { label: "Terjadwal", value: rows.filter(r=>r.data.status==="Scheduled").length, icon: "&#128197;", color: "blue" },
+      { label: "Selesai", value: rows.filter(r=>r.data.status==="Closed").length, icon: "&#9989;", color: "green" },
     ],
   },
   capa: {
@@ -1120,6 +1165,7 @@ function seedDemoContent() {
   const categories = ["Near Miss","Kecelakaan Kerja","Kerusakan Alat","Kondisi Tidak Aman"];
   const incidentTitles = ["Pekerja Terpapar Zat Kimia Berbahaya","Insiden Terjatuh dari Ketinggian","Kelalaian Penggunaan APD","Tumpahan Cairan Kimia di Area Kerja","Instalasi Kabel Listrik Terbuka","Permukaan Lantai Licin di Area Produksi","Forklift Nyaris Bersinggungan dengan Pekerja","Kondisi APD Tidak Layak Pakai","Kebocoran Gas di Ruang Laboratorium","Percikan Api pada Panel Distribusi Listrik"];
   const genericTitles = {
+    hseplan: ["HSE Plan Proyek Konstruksi 2026","Program Kerja K3 Tahunan","Emergency Response Plan Area Produksi","Rencana Pelatihan & Sosialisasi K3"],
     inspeksi: ["Pemeriksaan APD","Pemeriksaan Perancah (Scaffold)","Pemeriksaan Alat Berat","Pemeriksaan Sistem Proteksi Kebakaran"],
     audit: ["Audit Sistem ISO 45001","Audit Internal K3","Audit Kepatuhan Vendor"],
     hiradc: WORK_TYPES.map(t => `Kajian Risiko ${t}`),
@@ -1189,7 +1235,7 @@ function seedDemoContent() {
 
 /* ---- schema-driven seeding helpers for the 13 bespoke operational modules ---- */
 function randFieldValue(rnd, f, userIds, projectsNames, idx) {
-  if (f.type === "select") return pick(rnd, f.options);
+  if (f.type === "select" || f.type === "select_other") return pick(rnd, f.options);
   if (f.type === "user") return pick(rnd, userIds);
   if (f.type === "date") return isoDate(addDays(new Date(), Math.floor(rnd() * 160) - 60));
   if (f.type === "number") return Math.floor(rnd() * 100);
@@ -1236,6 +1282,10 @@ function seedGenericModule(rnd, mod, n, titlesList, userIds, projectsNames) {
       if (rnd() < 0.4) data.masa_berlaku = "";
       const todayStr = isoDate(new Date()), in30Str = isoDate(addDays(new Date(), 30));
       data.status = !data.masa_berlaku ? "Active" : data.masa_berlaku < todayStr ? "Expired" : data.masa_berlaku <= in30Str ? "Warning" : "Active";
+    }
+    if (mod === "hseplan") {
+      // Pastikan "Tanggal Selesai" selalu setelah "Tanggal Mulai" (masa program wajar).
+      if (data.tanggal_mulai) data.tanggal_selesai = isoDate(addDays(new Date(data.tanggal_mulai), 30 + Math.floor(rnd() * 150)));
     }
     if (mod === "pelatihan") {
       // Selaraskan "Jumlah Peserta" dengan jumlah nama yang tercentang di "Daftar Peserta"
@@ -1542,6 +1592,11 @@ function barChart(rows, valueKeys, labelKey) {
     return item;
   });
 }
+/* Kotak "keterangan" kecil di bawah sebuah chart — ringkasan/insight singkat
+   supaya pembaca tidak perlu menafsirkan sendiri apa arti chart di atasnya. */
+function chartInsight(html) {
+  return `<div class="chart-insight"><span class="ci-icon">&#128161;</span><span>${html}</span></div>`;
+}
 function donutChart(rows, valueKey, labelKey, palette) {
   palette = palette || PALETTE;
   const total = rows.reduce((s, r) => s + (r[valueKey] || 0), 0) || 1;
@@ -1626,6 +1681,56 @@ function svgGroupedBarChart(trend, series) {
   });
   const labels = trend.map((t, i) => `<text x="${(padL + i * groupW + groupW / 2).toFixed(1)}" y="${H - 6}" font-size="10" fill="rgba(255,255,255,.5)" text-anchor="middle">${esc(t.label)}</text>`).join("");
   return `<svg viewBox="0 0 ${W} ${H}" class="trend-svg" role="img" aria-label="Grafik batang tren"><defs>${defs}</defs>${grid}${marks}${labels}</svg>`;
+}
+/* Grafik batang bertumpuk (stacked) + garis tren total — dipakai untuk "Tren Insiden &
+   Near Miss" di Dashboard, gantinya grafik batang berdampingan. Batang berdampingan
+   memang mudah dibaca per-kategori, tapi menyembunyikan angka TOTAL bulanan (harus
+   menjumlah sendiri dua batang di kepala). Versi ini menumpuk Near Miss & Insiden jadi
+   satu batang per bulan (jadi tinggi batang = total sekilas), plus garis tren tipis yang
+   menghubungkan titik total tiap bulan supaya arah naik/turunnya langsung kelihatan. */
+function svgStackedTrendChart(trend, series) {
+  if (!trend.length) return `<div class="empty-state">Belum ada data.</div>`;
+  const W = 600, H = 236, padL = 10, padR = 10, padT = 40, padB = 26;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const n = trend.length;
+  const totals = trend.map(t => series.reduce((s, sr) => s + (t[sr.key] || 0), 0));
+  let maxVal = Math.max(1, ...totals);
+  const grid = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const y = padT + innerH - f * innerH;
+    return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.08)" stroke-width="1"/>`;
+  }).join("");
+  const colW = innerW / n;
+  const barW = Math.min(38, colW * 0.42);
+  let defs = "";
+  series.forEach((s, si) => {
+    defs += `<linearGradient id="stackGrad${si}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${s.colorTop || s.color}"/><stop offset="100%" stop-color="${s.colorBottom || s.color}"/></linearGradient>`;
+  });
+  defs += `<filter id="stackGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  defs += `<filter id="dotGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  let bars = "", points = [];
+  trend.forEach((t, i) => {
+    const cx = padL + i * colW + colW / 2;
+    const x = cx - barW / 2;
+    let cursorY = padT + innerH;
+    series.forEach((s, si) => {
+      const val = t[s.key] || 0;
+      const segH = maxVal ? (val / maxVal) * innerH : 0;
+      const y = cursorY - segH;
+      const isTop = si === series.length - 1;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(segH, val > 0 ? 2 : 0).toFixed(1)}" rx="${isTop ? 4 : 0}" fill="url(#stackGrad${si})" filter="url(#stackGlow)"><title>${esc(s.name)} — ${esc(t.label)}: ${val}</title></rect>`;
+      if (segH >= 16) bars += `<text x="${cx.toFixed(1)}" y="${(y + segH / 2 + 3.5).toFixed(1)}" font-size="9" font-weight="700" fill="rgba(255,255,255,.85)" text-anchor="middle">${val}</text>`;
+      cursorY = y;
+    });
+    const total = totals[i];
+    const topY = padT + innerH - (maxVal ? (total / maxVal) * innerH : 0);
+    bars += `<text x="${cx.toFixed(1)}" y="${(topY - 8).toFixed(1)}" font-size="11" font-weight="800" fill="#fff" text-anchor="middle">${total}</text>`;
+    points.push({ x: cx, y: topY, total, label: t.label });
+  });
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const trendLine = points.length > 1 ? `<path d="${linePath}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.8" stroke-dasharray="3 3"/>` : "";
+  const dots = points.map(p => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.2" fill="#fff" filter="url(#dotGlow)"><title>Total ${esc(p.label)}: ${p.total}</title></circle>`).join("");
+  const labels = trend.map((t, i) => `<text x="${(padL + i * colW + colW / 2).toFixed(1)}" y="${H - 6}" font-size="10" fill="rgba(255,255,255,.5)" text-anchor="middle">${esc(t.label)}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="trend-svg" role="img" aria-label="Grafik batang bertumpuk dengan garis tren total"><defs>${defs}</defs>${grid}${bars}${trendLine}${dots}${labels}</svg>`;
 }
 function svgGauge(score) {
   const size = 160, stroke = 14, r = (size - stroke) / 2, c = size / 2, circ = 2 * Math.PI * r;
@@ -2140,8 +2245,25 @@ function renderDashboard() {
   const byCategory = [...catCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([category,c])=>({category,c}));
   const { gradient, legend } = donutChart(byCategory, "c", "category");
   const topCategory = byCategory[0]?.category || "-";
+  const topCategoryPct = total ? Math.round(((byCategory[0]?.c || 0) / total) * 100) : 0;
 
   const recent = [...incidents].sort((a,b)=> (b.created_at||"").localeCompare(a.created_at||"")).slice(0,6);
+
+  // Keterangan otomatis untuk chart tren: bulan tertinggi + arah naik/turun dua bulan terakhir.
+  const trendTotals = trend.map(t => ({ label: t.label, total: (t.near_miss || 0) + (t.insiden || 0) }));
+  const peakMonth = trendTotals.reduce((a, b) => (b.total > a.total ? b : a), trendTotals[0] || { label: "-", total: 0 });
+  const lastTwo = trendTotals.slice(-2);
+  let trendDeltaText = "";
+  if (lastTwo.length === 2) {
+    const [prev, cur] = lastTwo;
+    if (prev.total > 0) {
+      const pct = Math.round(((cur.total - prev.total) / prev.total) * 100);
+      trendDeltaText = pct === 0 ? `stabil dibanding ${esc(prev.label)}` : `${pct > 0 ? "naik" : "turun"} ${Math.abs(pct)}% dibanding ${esc(prev.label)}`;
+    } else if (cur.total > 0) {
+      trendDeltaText = `naik dari nihil di ${esc(prev.label)}`;
+    }
+  }
+  const scoreBand = safetyScore >= 85 ? { label: "Sangat Baik", color: "#51cf66" } : safetyScore >= 70 ? { label: "Baik", color: "#94d82d" } : safetyScore >= 50 ? { label: "Perlu Perhatian", color: "#ffd43b" } : { label: "Berisiko Tinggi", color: "#ff6b6b" };
 
   setContent(`
     <div class="stat-grid stat-grid-3">
@@ -2155,9 +2277,10 @@ function renderDashboard() {
     <div class="grid-2">
       <div class="panel chart-glass clickable" data-action="goto-hash" data-hash="#/insiden" title="Klik untuk lihat detail insiden">
         <div class="panel-title">TREN INSIDEN &amp; NEAR MISS</div>
-        <div class="panel-subtitle">Dihitung otomatis dari tanggal kejadian tercatat &middot; klik untuk detail</div>
-        ${svgGroupedBarChart(trend, trendSeries)}
-        <div class="legend-row">${trendSeries.map(s => `<span class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.name)}</span>`).join("")}</div>
+        <div class="panel-subtitle">Batang bertumpuk = total per bulan &middot; garis putus-putus = tren total &middot; klik untuk detail</div>
+        ${svgStackedTrendChart(trend, trendSeries)}
+        <div class="legend-row">${trendSeries.map(s => `<span class="legend-item"><span class="legend-dot" style="background:${s.color};"></span>${esc(s.name)}</span>`).join("")}<span class="legend-item"><span class="legend-dot" style="background:rgba(255,255,255,.55);"></span>Total (garis tren)</span></div>
+        ${chartInsight(`Bulan dengan catatan terbanyak: <strong>${esc(peakMonth.label)}</strong> (${peakMonth.total} kejadian).${trendDeltaText ? ` Bulan ${esc(lastTwo[1]?.label || "")} ${trendDeltaText}.` : ""}`)}
       </div>
       <div>
         <div class="safety-score-card chart-glass clickable" data-action="goto-hash" data-hash="#/performa" title="Lihat Performa HSE">
@@ -2166,6 +2289,7 @@ function renderDashboard() {
             ${svgGauge(safetyScore)}
             <div class="gauge-center"><div class="gauge-value">${safetyScore}</div><div class="gauge-max">/ 100</div></div>
           </div>
+          <div class="stat-sub" style="text-align:center; margin-top:6px; color:${scoreBand.color};">Kategori: <strong>${scoreBand.label}</strong></div>
         </div>
         <div class="info-panel">
           <div class="info-title">&#128202; RINGKASAN OTOMATIS</div>
@@ -2191,6 +2315,7 @@ function renderDashboard() {
           </div>
           <div class="donut-legend">${legend.map(l => `<div class="legend-item clickable" data-action="goto-filter" data-filter="${esc(l.label)}" title="Filter insiden kategori ${esc(l.label)}"><span class="legend-dot" style="background:${l.color}"></span>${esc(l.label)}<strong>${l.pct}%</strong></div>`).join("")}</div>
         </div>
+        ${chartInsight(`Kategori terbanyak: <strong>${esc(topCategory)}</strong> — ${byCategory[0]?.c || 0} dari ${total} catatan (${topCategoryPct}%).`)}
       </div>
     </div>
   `);
@@ -2209,6 +2334,8 @@ function renderPerforma() {
 
   const moduleCounts = groupCount(DATA.generic, r => r.module);
   const moduleRows = [...moduleCounts.entries()].sort((a,b)=>b[1]-a[1]).map(([m,c])=>({module:m,c,label:MODULE_LABELS[m]||m}));
+  const closedEntry = legend.find(l => l.label === "Closed");
+  const closedPct = closedEntry ? closedEntry.pct : 0;
 
   setContent(`
     <div class="grid-2">
@@ -2218,6 +2345,7 @@ function renderPerforma() {
         ${byProject.length ? byProject.map(p => `
           <div class="hbar-row"><div class="hbar-label">${esc(p.label)}</div><div class="hbar-track"><div class="hbar-fill" style="width:${p.c_pct}%"></div></div><div class="hbar-value">${p.c}</div></div>
         `).join("") : `<div class="empty-state">Belum ada data.</div>`}
+        ${byProject.length ? chartInsight(`Lokasi dengan catatan terbanyak: <strong>${esc(byProject[0].label)}</strong> (${byProject[0].c} kejadian).`) : ""}
       </div>
       <div class="panel">
         <div class="panel-title">STATUS PENANGANAN</div>
@@ -2226,6 +2354,7 @@ function renderPerforma() {
           <div class="donut" style="background:${gradient}"></div>
           <div class="donut-legend">${legend.map(l => `<div class="legend-item"><span class="legend-dot" style="background:${l.color}"></span>${esc(l.label)}<strong>${l.pct}%</strong></div>`).join("")}</div>
         </div>
+        ${incidents.length ? chartInsight(`<strong>${closedPct}%</strong> insiden sudah berstatus Closed (selesai ditangani).`) : ""}
       </div>
     </div>
     <div class="panel">
@@ -2257,6 +2386,7 @@ function renderStatistik() {
   const now = new Date();
   const durations = incidents.filter(i => i.status === "Closed").map(i => { const d = parseDT(i.occurred_at); return d ? Math.round((now - d)/86400000) : null; }).filter(x => x !== null);
   const avgResolution = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
+  const peakStatMonth = monthlyRaw.reduce((a, b) => (b.c > a.c ? b : a), monthlyRaw[0] || { label: "-", c: 0 });
 
   setContent(`
     <div class="kpi-grid">
@@ -2267,13 +2397,15 @@ function renderStatistik() {
         <div class="panel-title">TREN INSIDEN BULANAN</div>
         <div class="panel-subtitle">Perbandingan jumlah insiden tiap bulan</div>
         <div class="bars">
-          ${monthly.length ? monthly.map(m => `<div class="bar-col"><div class="bar-stack" style="height:${Math.max(m.c_pct,6)}%"><div class="bar-seg" style="height:100%; background:#3b5bdb;" title="${m.c}"></div></div><div class="bar-label">${esc(m.label)}</div></div>`).join("") : `<div class="empty-state">Belum ada data.</div>`}
+          ${monthly.length ? monthly.map(m => `<div class="bar-col"><div class="bar-value">${m.c}</div><div class="bar-stack" style="height:${Math.max(m.c_pct,6)}%"><div class="bar-seg" style="height:100%; background:#3b5bdb;" title="${m.c}"></div></div><div class="bar-label">${esc(m.label)}</div></div>`).join("") : `<div class="empty-state">Belum ada data.</div>`}
         </div>
+        ${monthly.length ? chartInsight(`Bulan dengan insiden terbanyak: <strong>${esc(peakStatMonth.label)}</strong> (${peakStatMonth.c} kejadian).`) : ""}
       </div>
       <div class="panel">
         <div class="panel-title">RATA-RATA WAKTU PENYELESAIAN</div>
         <div class="panel-subtitle">Dihitung dari insiden yang berstatus Closed</div>
         <div class="stat-card stat-mesh mesh-5" style="margin-top:6px;"><div class="stat-label">WAKTU PENYELESAIAN RATA-RATA</div><div class="stat-value">${avgResolution} hari</div><div class="stat-sub">Rentang dari tanggal kejadian sampai sekarang</div></div>
+        ${chartInsight(`Dihitung dari <strong>${durations.length}</strong> insiden yang sudah Closed. Semakin kecil angka ini, semakin cepat tim menyelesaikan temuan.`)}
       </div>
     </div>
   `);
@@ -2322,6 +2454,7 @@ function renderSafetyManHours() {
     byProject[p].manHours += manHoursOf(r);
   });
   const projectRows = Object.entries(byProject).sort((a,b)=>b[1].manHours-a[1].manHours);
+  const peakHoursMonth = monthlyRaw.reduce((a, b) => (b.c > a.c ? b : a), monthlyRaw[0] || { label: "-", c: 0 });
 
   setContent(`
     <div class="safety-score-card chart-glass" style="text-align:center; padding:30px 20px;">
@@ -2340,8 +2473,9 @@ function renderSafetyManHours() {
         <div class="panel-title">TREN JAM KERJA AMAN BULANAN</div>
         <div class="panel-subtitle">Total jam kerja (jumlah pekerja &times; jam kerja/hari) per bulan</div>
         <div class="bars">
-          ${monthly.length ? monthly.map(m => `<div class="bar-col"><div class="bar-stack" style="height:${Math.max(m.c_pct,6)}%"><div class="bar-seg" style="height:100%; background:#1baf7a;" title="${m.c}"></div></div><div class="bar-label">${esc(m.label)}</div></div>`).join("") : `<div class="empty-state">Belum ada data Man Power tercatat.</div>`}
+          ${monthly.length ? monthly.map(m => `<div class="bar-col"><div class="bar-value">${m.c.toLocaleString("id-ID")}</div><div class="bar-stack" style="height:${Math.max(m.c_pct,6)}%"><div class="bar-seg" style="height:100%; background:#1baf7a;" title="${m.c}"></div></div><div class="bar-label">${esc(m.label)}</div></div>`).join("") : `<div class="empty-state">Belum ada data Man Power tercatat.</div>`}
         </div>
+        ${monthly.length ? chartInsight(`Bulan dengan jam kerja aman terbanyak: <strong>${esc(peakHoursMonth.label)}</strong> (${peakHoursMonth.c.toLocaleString("id-ID")} jam).`) : ""}
       </div>
       <div class="panel">
         <div class="panel-title">REKAP PER PROYEK</div>
@@ -2660,6 +2794,10 @@ function renderFieldInput(f, value) {
   const req = f.required ? "required" : "";
   if (f.type === "textarea") return `<div class="form-group"><label>${esc(f.label)}</label><textarea class="text-input" name="${f.key}" rows="3" placeholder="${esc(f.ph||"")}" ${req}>${esc(value)}</textarea></div>`;
   if (f.type === "select") return `<div class="form-group"><label>${esc(f.label)}</label><select class="select-input" name="${f.key}" ${req}>${f.options.map(o=>`<option value="${esc(o)}" ${value===o?"selected":""}>${esc(o)}</option>`).join("")}</select></div>`;
+  if (f.type === "select_other") {
+    const isCustom = !!value && !f.options.includes(value);
+    return `<div class="form-group"><label>${esc(f.label)}</label><select class="select-input select-other-input" name="${f.key}" data-other-for="${f.key}" ${req}>${f.options.map(o=>`<option value="${esc(o)}" ${!isCustom && value===o?"selected":""}>${esc(o)}</option>`).join("")}<option value="__lainnya__" ${isCustom?"selected":""}>Lainnya (ketik manual)</option></select><input class="text-input select-other-text" type="text" name="${f.key}__other" data-other-input="${f.key}" placeholder="Ketik ${esc(f.label.toLowerCase())} lainnya..." value="${esc(isCustom?value:"")}" style="margin-top:8px;${isCustom?"":"display:none;"}"></div>`;
+  }
   if (f.type === "user") { const users=[...DATA.users].sort((a,b)=>a.name.localeCompare(b.name)); return `<div class="form-group"><label>${esc(f.label)}</label><select class="select-input" name="${f.key}"><option value="">Pilih...</option>${users.map(u=>`<option value="${u.id}" ${String(value)===String(u.id)?"selected":""}>${esc(u.name)}</option>`).join("")}</select></div>`; }
   if (f.type === "employee_multi") {
     const checkedIds = employeeIdsFromValue(value);
@@ -2710,6 +2848,18 @@ function wireEmployeeMultiSync(container) {
     });
   });
 }
+/* Untuk field select_other: saat opsi "Lainnya (ketik manual)" dipilih, tampilkan
+   kotak teks manual di bawahnya; sembunyikan lagi kalau pilihan lain dipilih. */
+function wireSelectOtherSync(container) {
+  container.querySelectorAll(".select-other-input").forEach(sel => {
+    const key = sel.dataset.otherFor;
+    const textInput = container.querySelector(`[data-other-input="${key}"]`);
+    if (!textInput) return;
+    const sync = () => { textInput.style.display = sel.value === "__lainnya__" ? "" : "none"; };
+    sel.addEventListener("change", sync);
+    sync();
+  });
+}
 function openGenericAdd(mod) {
   if (demoBlockAdd()) return;
   const schema = MODULE_SCHEMAS[mod];
@@ -2717,6 +2867,7 @@ function openGenericAdd(mod) {
   const fieldsBox = document.getElementById("moduleFormFields");
   fieldsBox.innerHTML = renderFormFields(schema, null);
   wireEmployeeMultiSync(fieldsBox);
+  wireSelectOtherSync(fieldsBox);
   const form = document.getElementById("moduleForm");
   form.dataset.mode = "create"; form.dataset.module = mod; delete form.dataset.id;
   openModal("moduleModal");
@@ -2728,6 +2879,7 @@ function openGenericEdit(mod, id) {
   const fieldsBox = document.getElementById("moduleFormFields");
   fieldsBox.innerHTML = renderFormFields(schema, record);
   wireEmployeeMultiSync(fieldsBox);
+  wireSelectOtherSync(fieldsBox);
   const form = document.getElementById("moduleForm");
   form.dataset.mode = "edit"; form.dataset.module = mod; form.dataset.id = id;
   openModal("moduleModal");
@@ -2736,7 +2888,15 @@ function openGenericEdit(mod, id) {
 function buildGenericRecord(mod, formData, existing) {
   const schema = MODULE_SCHEMAS[mod];
   const data = {};
-  schema.fields.forEach(f => { data[f.key] = f.type === "employee_multi" ? formData.getAll(f.key).join(",") : (formData.get(f.key) || ""); });
+  schema.fields.forEach(f => {
+    if (f.type === "employee_multi") { data[f.key] = formData.getAll(f.key).join(","); return; }
+    if (f.type === "select_other") {
+      const raw = formData.get(f.key) || "";
+      data[f.key] = raw === "__lainnya__" ? (formData.get(f.key + "__other") || "").trim() : raw;
+      return;
+    }
+    data[f.key] = formData.get(f.key) || "";
+  });
   if (mod === "hiradc") {
     const l = parseInt(data.likelihood, 10) || 0, s = parseInt(data.severity_n, 10) || 0;
     const score = l * s;
@@ -3472,12 +3632,14 @@ document.getElementById("setupImportFile").addEventListener("change", e => {
   reader.readAsText(file);
 });
 
+document.getElementById("updateBannerClose")?.addEventListener("click", () => {
+  document.getElementById("updateBanner")?.classList.add("hidden");
+});
+
 /* ---------------------------- boot ------------------------------------------ */
 paintLogos();
 loadCompany();
 if (DEMO_MODE) {
-  /* Demo publik: langsung tampilkan Dashboard berisi data contoh tanpa perlu
-     mengisi form setup, supaya pengunjung bisa langsung mencoba aplikasinya. */
   COMPANY = {
     name: "PT Demo HSE OMNI PRO", industry: "Konstruksi & Industri Umum",
     address: "Versi Demo — data akan direset setiap kunjungan baru", phone: "",
