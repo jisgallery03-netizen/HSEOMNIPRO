@@ -62,6 +62,7 @@ button { font-family:inherit; }
 .dc-btn { flex:1; border:none; border-radius:8px; padding:8px 6px; font-size:10.5px; font-weight:800; cursor:pointer; letter-spacing:.2px; }
 .dc-btn.export { background:#ffd43b; color:#1a1f3a; }
 .dc-btn.import { background:rgba(255,255,255,.12); color:#fff; }
+.dc-btn-xlsx { width:100%; margin-top:6px; background:linear-gradient(135deg,var(--green-500),var(--green-600)); color:#fff; }
 .dc-reset-link { display:block; width:100%; text-align:left; background:none; border:none; color:#7c85b3; font-size:10px; text-decoration:underline; cursor:pointer; padding:8px 0 0; }
 .user-card { display:flex; align-items:center; gap:10px; padding:10px 8px; border-top:1px solid rgba(255,255,255,.08); }
 .user-avatar { width:36px; height:36px; border-radius:10px; background:#303c7a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; flex-shrink:0; }
@@ -653,6 +654,7 @@ tr.row-clickable:hover { background:var(--gray-50); }
           <button class="dc-btn export" id="exportBtn">&#8681; Export JSON</button>
           <button class="dc-btn import" id="importBtn">&#8679; Import JSON</button>
         </div>
+        <button type="button" class="dc-btn dc-btn-xlsx" id="exportXlsxBtn">&#128202; Export ke Excel (.xlsx)</button>
         <input type="file" id="importFile" accept="application/json" class="hidden">
         <button type="button" id="resetDataBtn" class="dc-reset-link">Reset ke data kosong</button>
       </div>
@@ -1893,6 +1895,41 @@ function printMastheadHtml() {
   `;
 }
 
+/* ---- No. Referensi dokumen, format: HSE/{KODE MODUL}/DDMMYY + urutan 2 digit
+   pada tanggal terbit tsb (mis. HIRADC terbit 25-08-2026, dokumen pertama hari itu
+   -> HSE/HIRADC/25082601, kalau ada lagi di hari yang sama lanjut ...02, dst).
+   Dihitung on-the-fly dari record_date (bukan disimpan), jadi otomatis konsisten
+   walau data diedit/di-import ulang; kalau tanggalnya kosong, fallback ke ID lama
+   supaya tidak pernah kosong/rusak. ---- */
+const MODULE_REF_CODE = {
+  hiradc: "HIRADC", ptw: "PTW", inspeksi: "INSPEKSI", hseplan: "HSEPLAN",
+  capa: "CAPA", audit: "AUDIT", legal: "LEGAL", sertifikasi: "SERTIFIKASI",
+  csms: "CSMS", kalender: "KALENDER", rapat: "RAPAT", pelatihan: "PELATIHAN",
+  inventaris: "INVENTARIS", dokumen: "DOKUMEN", manpower: "MANPOWER",
+};
+function refDateParts(dateStr) {
+  if (!dateStr || dateStr.length < 10) return null;
+  const y = dateStr.slice(0, 4), m = dateStr.slice(5, 7), d = dateStr.slice(8, 10);
+  if (!/^\d{4}$/.test(y) || !/^\d{2}$/.test(m) || !/^\d{2}$/.test(d)) return null;
+  return { dd: d, mm: m, yy: y.slice(2) };
+}
+function genericDocRef(mod, r) {
+  const code = MODULE_REF_CODE[mod] || mod.toUpperCase();
+  const parts = refDateParts(r.record_date);
+  if (!parts) return `HSE/${code}/${String(r.id).padStart(5, "0")}`;
+  const sameDay = DATA.generic.filter(x => x.module === mod && x.record_date === r.record_date).sort((a, b) => a.id - b.id);
+  const seq = sameDay.findIndex(x => x.id === r.id) + 1;
+  return `HSE/${code}/${parts.dd}${parts.mm}${parts.yy}${String(seq).padStart(2, "0")}`;
+}
+function incidentDocRef(r) {
+  const dateStr = (r.occurred_at || "").slice(0, 10);
+  const parts = refDateParts(dateStr);
+  if (!parts) return `HSE/INSIDEN/${String(r.id).padStart(5, "0")}`;
+  const sameDay = DATA.incidents.filter(x => (x.occurred_at || "").slice(0, 10) === dateStr).sort((a, b) => a.id - b.id);
+  const seq = sameDay.findIndex(x => x.id === r.id) + 1;
+  return `HSE/INSIDEN/${parts.dd}${parts.mm}${parts.yy}${String(seq).padStart(2, "0")}`;
+}
+
 function viewHeadMeta(opts) {
   return `
     ${printMastheadHtml()}
@@ -1936,7 +1973,7 @@ function docViewCard(opts) {
    kotak otorisasi pada web referensi (kartu skor risiko, cap verifikasi, dst) ---- */
 function hiradcViewCard(r, usersIdx) {
   const d = r.data;
-  const docNo = `HSE/HIRADC/${String(r.id).padStart(5, "0")}`;
+  const docNo = genericDocRef("hiradc", r);
   const riskLevel = d.risk_level || "-";
   const riskClass = RISK_BADGE[riskLevel] || "risk-medium";
   const likNum = String(d.likelihood || "-").split(" ")[0];
@@ -2002,7 +2039,7 @@ const HIRADC_MATRIX = {
 };
 function hiradcOfficialViewCard(r, usersIdx) {
   const d = r.data;
-  const docNo = `HSE/HIRADC/${String(r.id).padStart(5, "0")}`;
+  const docNo = genericDocRef("hiradc", r);
   const likNum = parseInt(String(d.likelihood || "3").split(" ")[0], 10) || 3;
   const sevNum = parseInt(String(d.severity_n || "3").split(" ")[0], 10) || 3;
   const peluangLetter = HIRADC_PELUANG_LETTER[likNum] || "C";
@@ -2096,7 +2133,7 @@ function ptwViewCard(r, usersIdx) {
   return `
     ${viewHeadMeta({
       title: r.title, icon: "&#128737;", docType: "SURAT IZIN KERJA AMAN",
-      docId: r.id, location: d.lokasi || "-", date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
+      docId: genericDocRef("ptw", r), location: d.lokasi || "-", date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
     })}
     <div class="view-banner" style="background:#eda100;color:#fff;">
       <div class="vb-tag">SURAT IZIN KERJA AMAN &middot; ${esc((d.jenis_pekerjaan||"-").toUpperCase())}</div>
@@ -2614,7 +2651,7 @@ function viewIncident(id) {
   const projectsIdx = indexById("projects");
   const usersIdx = indexById("users");
   openView(docViewCard({
-    title: r.name, icon: "&#9888;", docType: "CATATAN INVESTIGASI INSIDEN", docId: r.id,
+    title: r.name, icon: "&#9888;", docType: "CATATAN INVESTIGASI INSIDEN", docId: incidentDocRef(r),
     location: projectsIdx[r.project_id]?.name || "-", date: fmtDateTime(r.occurred_at),
     pic: usersIdx[r.pic_id]?.name || "-", status: r.status, bannerColor: "#e34948",
     kind: "incident", id: r.id, attachments: r.attachments,
@@ -2949,7 +2986,7 @@ function viewGenericRecord(mod, id) {
   });
   const locVal = genericRecordLocation(r) || "-";
   openView(docViewCard({
-    title, icon: schema.icon, docType: schema.docType, docId: r.id, location: locVal,
+    title, icon: schema.icon, docType: schema.docType, docId: genericDocRef(mod, r), location: locVal,
     date: r.record_date, pic: usersIdx[r.created_by]?.name || "-", status: r.status,
     bannerColor: schema.bannerColor, detailBoxes: boxes, hideOwner: schema.hideOwner,
     kind: "generic:" + mod, id: r.id, attachments: r.attachments,
@@ -3565,6 +3602,235 @@ document.getElementById("resetDataBtn").addEventListener("click", () => {
   FLASH = { type: "success", message: "Data direset ke kondisi kosong." };
   location.hash = "#/dashboard";
   render();
+});
+
+/* ---------------------------- export ke Excel (.xlsx) -----------------------
+   Aplikasi ini tidak boleh bergantung pada library eksternal (harus tetap
+   jalan 100% offline lewat file://, tanpa CDN/npm). Jadi file .xlsx (yang
+   sebenarnya adalah arsip ZIP berisi beberapa file XML format OOXML) ditulis
+   sendiri di sini dari nol: CRC32 + penulis ZIP minimal (metode STORE, tanpa
+   kompresi supaya tidak perlu implementasi algoritma deflate), lalu potongan
+   XML workbook/worksheet standar Excel. Satu sheet dibuat untuk tiap modul
+   data (termasuk Insiden, Tim, dan Proyek) supaya semua data bisa diaudit di
+   Excel/Google Sheets tanpa perlu install apa pun. */
+function crc32(bytes) {
+  if (!crc32.table) {
+    const t = [];
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = c & 1 ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    crc32.table = t;
+  }
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ crc32.table[(crc ^ bytes[i]) & 0xFF];
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function makeZipBlob(files, mimeType) {
+  const encoder = new TextEncoder();
+  const localParts = [], centralParts = [];
+  let offset = 0;
+  files.forEach(f => {
+    const nameBytes = encoder.encode(f.name);
+    const data = f.data;
+    const crc = crc32(data);
+    const size = data.length;
+    const local = new Uint8Array(30 + nameBytes.length);
+    const ldv = new DataView(local.buffer);
+    ldv.setUint32(0, 0x04034b50, true);
+    ldv.setUint16(4, 20, true);
+    ldv.setUint16(6, 0, true);
+    ldv.setUint16(8, 0, true);
+    ldv.setUint16(10, 0, true);
+    ldv.setUint16(12, 0x21, true);
+    ldv.setUint32(14, crc, true);
+    ldv.setUint32(18, size, true);
+    ldv.setUint32(22, size, true);
+    ldv.setUint16(26, nameBytes.length, true);
+    ldv.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+    localParts.push(local, data);
+
+    const central = new Uint8Array(46 + nameBytes.length);
+    const cdv = new DataView(central.buffer);
+    cdv.setUint32(0, 0x02014b50, true);
+    cdv.setUint16(4, 20, true);
+    cdv.setUint16(6, 20, true);
+    cdv.setUint16(8, 0, true);
+    cdv.setUint16(10, 0, true);
+    cdv.setUint16(12, 0, true);
+    cdv.setUint16(14, 0x21, true);
+    cdv.setUint32(16, crc, true);
+    cdv.setUint32(20, size, true);
+    cdv.setUint32(24, size, true);
+    cdv.setUint16(28, nameBytes.length, true);
+    cdv.setUint16(30, 0, true);
+    cdv.setUint16(32, 0, true);
+    cdv.setUint16(34, 0, true);
+    cdv.setUint16(36, 0, true);
+    cdv.setUint32(38, 0, true);
+    cdv.setUint32(42, offset, true);
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+
+    offset += local.length + data.length;
+  });
+  const centralOffset = offset;
+  const centralSize = centralParts.reduce((s, p) => s + p.length, 0);
+  const eocd = new Uint8Array(22);
+  const edv = new DataView(eocd.buffer);
+  edv.setUint32(0, 0x06054b50, true);
+  edv.setUint16(4, 0, true);
+  edv.setUint16(6, 0, true);
+  edv.setUint16(8, files.length, true);
+  edv.setUint16(10, files.length, true);
+  edv.setUint32(12, centralSize, true);
+  edv.setUint32(16, centralOffset, true);
+  edv.setUint16(20, 0, true);
+  return new Blob([...localParts, ...centralParts, eocd], { type: mimeType || "application/zip" });
+}
+function esxml(v) {
+  if (v === null || v === undefined) return "";
+  return String(v)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
+}
+function xlsxColLetter(n) {
+  let s = "";
+  while (n > 0) { const m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+function xlsxCellXml(colIdx, rowIdx, cell) {
+  const ref = xlsxColLetter(colIdx) + rowIdx;
+  const raw = cell && cell.value;
+  if (cell && cell.numeric && raw !== "" && raw !== null && raw !== undefined && isFinite(Number(raw))) {
+    return `<c r="${ref}"><v>${Number(raw)}</v></c>`;
+  }
+  const text = esxml(raw ?? "");
+  if (text === "") return `<c r="${ref}"/>`;
+  return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${text}</t></is></c>`;
+}
+function xlsxSheetXml(headers, rows) {
+  let xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>`;
+  xml += `<row r="1">` + headers.map((h, i) => xlsxCellXml(i + 1, 1, { value: h.label })).join("") + `</row>`;
+  rows.forEach((row, ri) => {
+    xml += `<row r="${ri + 2}">` + row.map((cell, ci) => xlsxCellXml(ci + 1, ri + 2, cell)).join("") + `</row>`;
+  });
+  xml += `</sheetData></worksheet>`;
+  return xml;
+}
+function sanitizeSheetName(name, used) {
+  let s = String(name || "Sheet").replace(/[\\\/\?\*\[\]:]/g, "-").trim().slice(0, 31) || "Sheet";
+  if (!used.has(s)) { used.add(s); return s; }
+  let n = 2, base = s;
+  while (used.has(s)) { const suffix = "_" + n++; s = base.slice(0, 31 - suffix.length) + suffix; }
+  used.add(s);
+  return s;
+}
+/* Kumpulkan seluruh data aplikasi (Insiden, semua modul operasional via
+   MODULE_SCHEMAS, Tim, dan Proyek) jadi daftar sheet {name, headers, rows}
+   siap-tulis. ID/user/employee_multi/foto diresolusi jadi nilai yang enak
+   dibaca manusia (bukan angka ID mentah), sama seperti tampilan Lihat Detail
+   di aplikasi. */
+function buildXlsxSheets() {
+  const usersIdx = indexById("users");
+  const projectsIdx = indexById("projects");
+  const sheets = [];
+
+  const incHeaders = [
+    { label: "ID" }, { label: "Nama Insiden" }, { label: "Kategori" }, { label: "Severity" },
+    { label: "Status" }, { label: "Lokasi/Proyek" }, { label: "Waktu Kejadian" }, { label: "Deskripsi" },
+    { label: "Akar Penyebab" }, { label: "Tindakan Perbaikan" }, { label: "PIC" }, { label: "Dibuat Pada" },
+  ];
+  const incRows = [...DATA.incidents].sort((a,b)=>(b.occurred_at||"").localeCompare(a.occurred_at||"")).map(r => [
+    { value: r.id, numeric: true }, { value: r.name }, { value: r.category }, { value: r.severity },
+    { value: r.status }, { value: projectsIdx[r.project_id]?.name || "" }, { value: fmtDateTime(r.occurred_at) },
+    { value: r.description }, { value: r.root_cause }, { value: r.corrective_action },
+    { value: usersIdx[r.pic_id]?.name || "" }, { value: fmtDateTime(r.created_at) },
+  ]);
+  sheets.push({ name: "Insiden", headers: incHeaders, rows: incRows });
+
+  Object.keys(MODULE_SCHEMAS).forEach(mod => {
+    const schema = MODULE_SCHEMAS[mod];
+    const headers = [{ label: "ID" }, ...schema.fields.map(f => ({ label: f.label })), { label: "Dibuat Oleh" }, { label: "Dibuat Pada" }];
+    const rows = DATA.generic.filter(r => r.module === mod).map(r => {
+      const cells = [{ value: r.id, numeric: true }];
+      schema.fields.forEach(f => {
+        const val = r.data[f.key];
+        if (f.type === "photo") { cells.push({ value: val ? "Ya" : "Tidak" }); return; }
+        if (f.type === "user") { cells.push({ value: usersIdx[val]?.name || "" }); return; }
+        if (f.type === "employee_multi") { cells.push({ value: employeeNamesFromValue(val).join(", ") }); return; }
+        if (f.type === "number") { cells.push({ value: val === "" || val === undefined ? "" : val, numeric: true }); return; }
+        cells.push({ value: val });
+      });
+      cells.push({ value: usersIdx[r.created_by]?.name || "" }, { value: fmtDateTime(r.created_at) });
+      return cells;
+    });
+    sheets.push({ name: schema.label, headers, rows });
+  });
+
+  sheets.push({
+    name: "Tim",
+    headers: [{ label: "ID" }, { label: "Nama" }, { label: "Email" }, { label: "No. HP" }, { label: "Role" }, { label: "Status" }, { label: "Poin" }],
+    rows: DATA.users.map(u => [
+      { value: u.id, numeric: true }, { value: u.name }, { value: u.email }, { value: u.phone },
+      { value: u.role }, { value: u.status }, { value: u.points, numeric: true },
+    ]),
+  });
+  sheets.push({
+    name: "Proyek",
+    headers: [{ label: "ID" }, { label: "Nama Proyek" }],
+    rows: DATA.projects.map(p => [{ value: p.id, numeric: true }, { value: p.name }]),
+  });
+
+  return sheets;
+}
+function generateXlsxBlob() {
+  const sheets = buildXlsxSheets();
+  const used = new Set();
+  const safeSheets = sheets.map(s => ({ ...s, safeName: sanitizeSheetName(s.name, used) }));
+
+  const contentTypesOverrides = safeSheets.map((s, i) => `<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("");
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${contentTypesOverrides}</Types>`;
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+
+  const sheetTags = safeSheets.map((s, i) => `<sheet name="${esxml(s.safeName)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("");
+  const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetTags}</sheets></workbook>`;
+
+  const workbookRelsEntries = safeSheets.map((s, i) => `<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("");
+  const stylesRelId = safeSheets.length + 1;
+  const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${workbookRelsEntries}<Relationship Id="rId${stylesRelId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+
+  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts><fills count="1"><fill><patternFill patternType="none"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs></styleSheet>`;
+
+  const encoder = new TextEncoder();
+  const files = [
+    { name: "[Content_Types].xml", data: encoder.encode(contentTypes) },
+    { name: "_rels/.rels", data: encoder.encode(rootRels) },
+    { name: "xl/workbook.xml", data: encoder.encode(workbookXml) },
+    { name: "xl/_rels/workbook.xml.rels", data: encoder.encode(workbookRels) },
+    { name: "xl/styles.xml", data: encoder.encode(stylesXml) },
+  ];
+  safeSheets.forEach((s, i) => {
+    files.push({ name: `xl/worksheets/sheet${i+1}.xml`, data: encoder.encode(xlsxSheetXml(s.headers, s.rows)) });
+  });
+
+  return makeZipBlob(files, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+}
+document.getElementById("exportXlsxBtn").addEventListener("click", () => {
+  try {
+    const blob = generateXlsxBlob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = isoDate(new Date());
+    a.href = url; a.download = `hse-omni-pro-data-${stamp}.xlsx`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert("Gagal membuat file Excel: " + err.message);
+  }
 });
 
 /* ---------------------------- export / import ------------------------------ */
