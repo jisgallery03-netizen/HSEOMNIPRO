@@ -262,6 +262,18 @@ table.data-table tr:hover td { background:var(--gray-50); }
 .photo-upload-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:8px; background:var(--gray-100); border:1px solid var(--gray-200); font-size:12px; font-weight:700; cursor:pointer; color:var(--text-dark); }
 .photo-remove-btn { border:none; background:none; color:#e34948; font-size:11.5px; font-weight:700; cursor:pointer; padding:0; text-align:left; }
 
+/* ---- field "photo_multi" (galeri foto, mis. Foto Temuan Inspeksi) ---- */
+.photo-multi-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.photo-multi-item { position:relative; width:84px; height:84px; border-radius:12px; overflow:hidden; border:1.5px solid var(--gray-200); background:var(--gray-100); flex-shrink:0; }
+.photo-multi-item img { width:100%; height:100%; object-fit:cover; display:block; }
+.photo-multi-remove { position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; border:none; background:rgba(20,20,20,0.65); color:#fff; font-size:14px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+.photo-multi-remove:hover { background:#e34948; }
+.photo-multi-add { width:84px; height:84px; border-radius:12px; border:1.5px dashed var(--gray-300); background:var(--gray-50); display:flex; align-items:center; justify-content:center; color:var(--gray-400); font-size:22px; cursor:pointer; flex-shrink:0; }
+.photo-multi-add:hover { background:var(--gray-100); color:var(--gray-600); }
+.photo-multi-view-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.photo-multi-view-thumb { width:96px; height:96px; border-radius:12px; overflow:hidden; border:1.5px solid var(--gray-200); background:var(--gray-100); flex-shrink:0; cursor:pointer; }
+.photo-multi-view-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+
 /* ---- kartu "ID Card" (tampilan Lihat khusus modul Employee) ---- */
 .idcard-wrap { display:flex; justify-content:center; padding:6px 0 24px; }
 .idcard { width:300px; max-width:100%; background:#fff; border-radius:16px; border:1px solid var(--gray-200); box-shadow:0 8px 24px rgba(20,25,70,.1); overflow:hidden; text-align:center; }
@@ -854,6 +866,7 @@ const MODULE_SCHEMAS = {
       { key: "pic", label: "Petugas Inspeksi (PIC)", type: "user" },
       { key: "temuan", label: "Temuan", type: "textarea", ph: "Uraikan temuan hasil inspeksi..." },
       { key: "rekomendasi", label: "Rekomendasi", type: "textarea", ph: "Rekomendasi tindak lanjut..." },
+      { key: "foto_temuan", label: "Foto Temuan Inspeksi", type: "photo_multi", ph: "Upload foto kondisi lapangan / temuan (bisa lebih dari satu)" },
       { key: "skor", label: "Nilai Assessment (%)", type: "number", ph: "0-100" },
       { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS, col: true, badge: true },
     ],
@@ -1247,6 +1260,8 @@ function randFieldValue(rnd, f, userIds, projectsNames, idx) {
     return [...pool].sort(() => rnd() - 0.5).slice(0, n).map(e => e.id).join(",");
   }
   if (LOCATION_FIELD_KEYS.includes(f.key)) return pick(rnd, projectsNames);
+  if (f.type === "photo") return "";
+  if (f.type === "photo_multi") return [];
   const codeKeys = { permit_code: "PTW", finding_code: "CAPA", no_seri: "SN" };
   if (codeKeys[f.key]) return `${codeKeys[f.key]}-${String(idx).padStart(3, "0")}`;
   if (f.key === "email") return `kontraktor${idx}@vendor.com`;
@@ -1832,6 +1847,23 @@ function resizeImageDataUrl(file, maxDim, quality) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+/* Field "photo_multi" (galeri foto, mis. "Foto Temuan" di modul Inspeksi) — beberapa foto
+   sekaligus, masing-masing di-resize/kompres sama seperti field "photo" tunggal. Disimpan
+   sebagai array {id, dataUrl} di data record. State foto yang sedang diedit di form
+   Tambah/Edit disimpan sementara di PHOTO_MULTI_STATE (direset tiap form dibuka/dirender),
+   supaya tidak perlu encode array besar ke atribut HTML (rawan/berat untuk foto banyak).*/
+let PHOTO_MULTI_STATE = {};
+function photoMultiNewId() { return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`; }
+function photoMultiGridHtml(fieldKey) {
+  const photos = PHOTO_MULTI_STATE[fieldKey] || [];
+  const items = photos.map(p => `
+    <div class="photo-multi-item">
+      <img src="${esc(p.dataUrl)}" alt="Foto">
+      <button type="button" class="photo-multi-remove" data-action="remove-photo-multi" data-field="${fieldKey}" data-photo-id="${esc(p.id)}" title="Hapus foto">&times;</button>
+    </div>`).join("");
+  return `${items}<label class="photo-multi-add" title="Tambah foto">${icon("camera")}<input type="file" accept="image/*" class="hidden" data-action-change="upload-photo-multi" data-field="${fieldKey}" multiple></label>`;
 }
 
 function formatBytes(n) {
@@ -2862,6 +2894,13 @@ function renderFieldInput(f, value) {
       <input type="hidden" name="${f.key}" id="photoValue_${f.key}" value="${esc(value)}">
     </div>`;
   }
+  if (f.type === "photo_multi") {
+    PHOTO_MULTI_STATE[f.key] = Array.isArray(value) ? value.filter(p => p && p.dataUrl).map(p => ({ id: p.id || photoMultiNewId(), dataUrl: p.dataUrl })) : [];
+    return `<div class="form-group">
+      <label>${esc(f.label)}${f.ph ? ` <span class="field-hint">— ${esc(f.ph)}</span>` : ""}</label>
+      <div class="photo-multi-grid" id="photoMultiGrid_${f.key}">${photoMultiGridHtml(f.key)}</div>
+    </div>`;
+  }
   if (f.type === "date") return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="date" name="${f.key}" value="${esc(value)}" ${req}></div>`;
   if (f.type === "number") return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="number" name="${f.key}" value="${esc(value)}" placeholder="${esc(f.ph||"")}"></div>`;
   return `<div class="form-group"><label>${esc(f.label)}</label><input class="text-input" type="text" name="${f.key}" value="${esc(value)}" placeholder="${esc(f.ph||"")}" ${req}></div>`;
@@ -2927,6 +2966,7 @@ function buildGenericRecord(mod, formData, existing) {
   const data = {};
   schema.fields.forEach(f => {
     if (f.type === "employee_multi") { data[f.key] = formData.getAll(f.key).join(","); return; }
+    if (f.type === "photo_multi") { data[f.key] = (PHOTO_MULTI_STATE[f.key] || []).map(p => ({ id: p.id, dataUrl: p.dataUrl })); return; }
     if (f.type === "select_other") {
       const raw = formData.get(f.key) || "";
       data[f.key] = raw === "__lainnya__" ? (formData.get(f.key + "__other") || "").trim() : raw;
@@ -2981,6 +3021,14 @@ function viewGenericRecord(mod, id) {
     let val = r.data[f.key];
     if (f.type === "user") val = usersIdx[val]?.name || "-";
     if (f.type === "employee_multi") val = employeeNamesFromValue(val).join(", ") || "-";
+    if (f.type === "photo_multi") {
+      const photos = Array.isArray(val) ? val.filter(p => p && p.dataUrl) : [];
+      const gallery = photos.length
+        ? `<div class="photo-multi-view-grid">${photos.map(p => `<a class="photo-multi-view-thumb" href="${esc(p.dataUrl)}" target="_blank" rel="noopener noreferrer" title="Lihat foto ukuran penuh"><img src="${esc(p.dataUrl)}" alt="Foto"></a>`).join("")}</div>
+           <button type="button" class="photo-remove-btn" style="margin-top:8px;" data-action="download-record-photos" data-module="${mod}" data-id="${r.id}">&#8681; Unduh Semua Foto Catatan Ini (ZIP)</button>`
+        : `<span style="color:var(--gray-400);font-size:12.5px;">Belum ada foto.</span>`;
+      return { label: f.label, value: gallery, html: true, full: true };
+    }
     if (f.badge) return { label: f.label, value: `<span class="badge ${badgeClassFor(f, r.data[f.key])}">${esc((val||"").toString().toUpperCase())}</span>`, html: true };
     return { label: f.label, value: val, full: f.type === "textarea" || f.type === "employee_multi" };
   });
@@ -3055,7 +3103,10 @@ function renderGenericModule(mod) {
     <div class="panel">
       <div class="table-toolbar">
         <div><div class="panel-title">${esc(schema.label.toUpperCase())}</div><div class="panel-subtitle">${rows.length} data tercatat${totalPages > 1 ? ` &middot; halaman ${page} dari ${totalPages}` : ""}</div></div>
-        <button class="btn btn-primary" id="openModuleModal">+ Tambah Data</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          ${mod === "inspeksi" ? `<button type="button" class="btn" style="background:var(--gray-100); border:1px solid var(--gray-200); color:var(--text-dark);" id="downloadInspeksiPhotosBtn" title="Unduh semua foto temuan Inspeksi sebagai satu file ZIP (per folder per catatan)">&#128247; Unduh Foto (ZIP)</button>` : ""}
+          <button class="btn btn-primary" id="openModuleModal">+ Tambah Data</button>
+        </div>
       </div>
       ${moduleStatCardsHtml(schema, rows)}
       <div class="table-scroll"><table class="data-table">
@@ -3075,6 +3126,8 @@ function renderGenericModule(mod) {
 
   document.getElementById("openModuleModal").addEventListener("click", () => openGenericAdd(mod));
   document.getElementById("moduleForm").addEventListener("submit", genericFormSubmitHandler);
+  const dlPhotosBtn = document.getElementById("downloadInspeksiPhotosBtn");
+  if (dlPhotosBtn) dlPhotosBtn.addEventListener("click", downloadInspeksiPhotosZip);
 }
 
 /* ---- CAPA: tampilan kartu + aksi cepat "Rubah Status" ---- */
@@ -3382,6 +3435,14 @@ document.addEventListener("click", e => {
     if (preview) preview.innerHTML = icon("user");
     btn.remove();
   }
+  if (action === "remove-photo-multi") {
+    const field = btn.dataset.field;
+    const photoId = btn.dataset.photoId;
+    PHOTO_MULTI_STATE[field] = (PHOTO_MULTI_STATE[field] || []).filter(p => String(p.id) !== String(photoId));
+    const grid = document.getElementById(`photoMultiGrid_${field}`);
+    if (grid) grid.innerHTML = photoMultiGridHtml(field);
+  }
+  if (action === "download-record-photos") downloadRecordPhotosZip(btn.dataset.module, Number(btn.dataset.id));
   if (action === "module-page") {
     const mod = btn.dataset.module;
     const dir = btn.dataset.dir;
@@ -3445,6 +3506,21 @@ document.addEventListener("change", e => {
         actionsRow.appendChild(btn);
       }
     }).catch(() => { alert("Gagal memuat foto. Coba file lain."); photoInput.value = ""; });
+  }
+  const photoMultiInput = e.target.closest('[data-action-change="upload-photo-multi"]');
+  if (photoMultiInput) {
+    const field = photoMultiInput.dataset.field;
+    const files = [...photoMultiInput.files].filter(f => f.type.startsWith("image/"));
+    const skipped = photoMultiInput.files.length - files.length;
+    if (skipped > 0) alert(`${skipped} berkas dilewati karena bukan gambar.`);
+    if (!files.length) { photoMultiInput.value = ""; return; }
+    PHOTO_MULTI_STATE[field] = PHOTO_MULTI_STATE[field] || [];
+    Promise.all(files.map(file => resizeImageDataUrl(file, 900, 0.8).catch(() => null))).then(results => {
+      results.forEach(dataUrl => { if (dataUrl) PHOTO_MULTI_STATE[field].push({ id: photoMultiNewId(), dataUrl }); });
+      photoMultiInput.value = "";
+      const grid = document.getElementById(`photoMultiGrid_${field}`);
+      if (grid) grid.innerHTML = photoMultiGridHtml(field);
+    });
   }
 });
 
@@ -3690,6 +3766,89 @@ function makeZipBlob(files, mimeType) {
   edv.setUint16(20, 0, true);
   return new Blob([...localParts, ...centralParts, eocd], { type: mimeType || "application/zip" });
 }
+
+/* ---------------------------- unduh foto Inspeksi (ZIP) ---------------------
+   Foto pada field "photo_multi" tersimpan sebagai base64 di dalam data record
+   (bukan file terpisah di komputer) — itu supaya seluruh aplikasi + datanya
+   tetap 1 file HTML yang portable & offline. Fitur ini mengumpulkan semua foto
+   temuan Inspeksi lalu membungkusnya jadi file .zip berisi folder per catatan
+   inspeksi, supaya user punya "kumpulan foto" nyata yang bisa dibuka di File
+   Explorer / Finder, lalu diunggah manual ke Google Drive atau ke mana pun. */
+function dataUrlToBytes(dataUrl) {
+  const base64 = (dataUrl.split(",")[1] || "").trim();
+  const bin = atob(base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+function sanitizeFileName(s) {
+  return (s || "")
+    .toString()
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80) || "tanpa-judul";
+}
+function buildInspeksiPhotoZipFiles() {
+  const schema = MODULE_SCHEMAS.inspeksi;
+  const photoField = schema.fields.find(f => f.type === "photo_multi");
+  if (!photoField) return [];
+  const titleField = schema.fields.find(f => f.title);
+  const records = DATA.generic.filter(r => r.module === "inspeksi" && Array.isArray(r.data[photoField.key]) && r.data[photoField.key].some(p => p && p.dataUrl));
+  const files = [];
+  const usedFolders = new Set();
+  records.forEach(r => {
+    const titleText = (titleField && r.data[titleField.key]) || r.title || `inspeksi-${r.id}`;
+    const ref = genericDocRef("inspeksi", r).replace(/\//g, "-");
+    const base = sanitizeFileName(`${ref} - ${titleText}`);
+    let folder = base, n = 2;
+    while (usedFolders.has(folder)) folder = `${base} (${n++})`;
+    usedFolders.add(folder);
+    r.data[photoField.key].filter(p => p && p.dataUrl).forEach((p, i) => {
+      const extMatch = /^data:image\/(\w+);/.exec(p.dataUrl);
+      const ext = extMatch ? extMatch[1].replace("jpeg", "jpg") : "jpg";
+      files.push({ name: `${folder}/foto-${i + 1}.${ext}`, data: dataUrlToBytes(p.dataUrl) });
+    });
+  });
+  return files;
+}
+function downloadInspeksiPhotosZip() {
+  const files = buildInspeksiPhotoZipFiles();
+  if (!files.length) { alert("Belum ada foto temuan yang diupload di modul Inspeksi."); return; }
+  const blob = makeZipBlob(files, "application/zip");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = isoDate(new Date());
+  a.href = url; a.download = `foto-temuan-inspeksi-${stamp}.zip`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function buildRecordPhotoZipFiles(mod, id) {
+  const schema = MODULE_SCHEMAS[mod];
+  const r = byId("generic", id);
+  if (!schema || !r) return [];
+  const photoField = schema.fields.find(f => f.type === "photo_multi");
+  if (!photoField) return [];
+  return (r.data[photoField.key] || []).filter(p => p && p.dataUrl).map((p, i) => {
+    const extMatch = /^data:image\/(\w+);/.exec(p.dataUrl);
+    const ext = extMatch ? extMatch[1].replace("jpeg", "jpg") : "jpg";
+    return { name: `foto-${i + 1}.${ext}`, data: dataUrlToBytes(p.dataUrl) };
+  });
+}
+function downloadRecordPhotosZip(mod, id) {
+  const files = buildRecordPhotoZipFiles(mod, id);
+  if (!files.length) return;
+  const r = byId("generic", id);
+  const schema = MODULE_SCHEMAS[mod];
+  const titleField = schema.fields.find(f => f.title);
+  const titleText = (titleField && r.data[titleField.key]) || r.title || `${mod}-${id}`;
+  const blob = makeZipBlob(files, "application/zip");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `${sanitizeFileName(titleText)}-foto.zip`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
 function esxml(v) {
   if (v === null || v === undefined) return "";
   return String(v)
@@ -3759,6 +3918,7 @@ function buildXlsxSheets() {
       schema.fields.forEach(f => {
         const val = r.data[f.key];
         if (f.type === "photo") { cells.push({ value: val ? "Ya" : "Tidak" }); return; }
+        if (f.type === "photo_multi") { cells.push({ value: Array.isArray(val) ? `${val.filter(p=>p&&p.dataUrl).length} foto` : "0 foto" }); return; }
         if (f.type === "user") { cells.push({ value: usersIdx[val]?.name || "" }); return; }
         if (f.type === "employee_multi") { cells.push({ value: employeeNamesFromValue(val).join(", ") }); return; }
         if (f.type === "number") { cells.push({ value: val === "" || val === undefined ? "" : val, numeric: true }); return; }
