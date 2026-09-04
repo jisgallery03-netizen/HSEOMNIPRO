@@ -828,6 +828,7 @@ const CAL_CATEGORY_COLOR = { Meeting: "#1baf7a", Training: "#eda100", Emergency:
    Setiap modul operasional punya field & tampilan sendiri (bukan generik),
    ditiru dari struktur data & aksi (Lihat/Edit/Hapus) pada web referensi. */
 const STATUS_OPTIONS = ["Open", "In Progress", "Closed", "Scheduled"];
+const TEAM_ROLE_OPTIONS = ["HSE Manager", "HSE Supervisor", "Safety Officer", "Admin HSE"];
 /* Jenis pekerjaan berisiko tinggi — daftar tunggal yang dipakai bersama oleh
    modul HIRADC (kajian risiko per jenis pekerjaan) dan PTW (izin kerja per
    jenis pekerjaan) supaya kategorinya selalu konsisten/selaras di kedua modul. */
@@ -2750,7 +2751,10 @@ function renderTeam() {
             <div class="form-group"><label>No. WhatsApp</label><input class="text-input" name="phone"></div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label>Peran / Jabatan</label><select class="select-input" name="role"><option>HSE Manager</option><option>HSE Supervisor</option><option>Safety Officer</option><option>Admin HSE</option></select></div>
+            <div class="form-group"><label>Peran / Jabatan</label>
+              <select class="select-input select-other-input" name="role" data-other-for="role">${TEAM_ROLE_OPTIONS.map(o=>`<option>${esc(o)}</option>`).join("")}<option value="__lainnya__">Lainnya (ketik manual)</option></select>
+              <input class="text-input select-other-text" type="text" name="role__other" data-other-input="role" placeholder="Ketik peran/jabatan lainnya..." style="margin-top:8px; display:none;">
+            </div>
             <div class="form-group"><label>Kontak Darurat (Nama - No. Telp)</label><input class="text-input" name="kontak_darurat" placeholder="Contoh: Istri - 081234..."></div>
           </div>
           <div class="form-row">
@@ -2767,14 +2771,17 @@ function renderTeam() {
     </div>
   `);
 
+  wireSelectOtherSync(document.getElementById("teamForm"));
   document.getElementById("openTeamModal").addEventListener("click", () => openTeamForm(null));
   document.getElementById("teamForm").addEventListener("submit", e => {
     e.preventDefault();
     const form = e.target;
     const f = new FormData(form);
     const isEdit = form.dataset.mode === "edit";
+    const roleRaw = f.get("role");
     const payload = {
-      name: f.get("name"), email: f.get("email"), phone: f.get("phone"), role: f.get("role"),
+      name: f.get("name"), email: f.get("email"), phone: f.get("phone"),
+      role: roleRaw === "__lainnya__" ? (f.get("role__other") || "").trim() : roleRaw,
       kontak_darurat: f.get("kontak_darurat"), gol_darah: f.get("gol_darah"), catatan_medis: f.get("catatan_medis"),
       sertifikat_utama: f.get("sertifikat_utama"), masa_berlaku_sertifikat: f.get("masa_berlaku_sertifikat") || null,
     };
@@ -2801,7 +2808,14 @@ function openTeamForm(id) {
   form.name.value = r?.name || "";
   form.email.value = r?.email || "";
   form.phone.value = r?.phone || "";
-  form.role.value = r?.role || "HSE Manager";
+  const roleVal = r?.role || "HSE Manager";
+  const isCustomRole = !!roleVal && !TEAM_ROLE_OPTIONS.includes(roleVal);
+  form.role.value = isCustomRole ? "__lainnya__" : roleVal;
+  const roleOtherInput = form.querySelector('[name="role__other"]');
+  if (roleOtherInput) {
+    roleOtherInput.value = isCustomRole ? roleVal : "";
+    roleOtherInput.style.display = isCustomRole ? "" : "none";
+  }
   form.kontak_darurat.value = r?.kontak_darurat || "";
   form.gol_darah.value = r?.gol_darah || "";
   form.catatan_medis.value = r?.catatan_medis || "";
